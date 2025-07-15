@@ -33,7 +33,7 @@ const Hero = () => {
     setToLocation(temp);
   };
   return (
-    <section className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 md:py-28 py-14">
+    <section className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 md:py-32 py-14">
       <div className="absolute inset-0 bg-black opacity-20"></div>
       <div
         className="absolute inset-0 bg-cover bg-center opacity-30"
