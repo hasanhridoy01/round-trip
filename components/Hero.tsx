@@ -22,16 +22,17 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const Hero = () => {
   const [tripType, setTripType] = useState("oneWay");
-  const [fromLocation, setFromLocation] = useState("");
-  const [toLocation, setToLocation] = useState("");
   const [journeyDate, setJourneyDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [isSwapped, setIsSwapped] = useState(false);
+
+  const [fromLocation, setFromLocation] = useState("");
+  const [toLocation, setToLocation] = useState("");
 
   const swapLocations = () => {
-    setFromLocation(toLocation);
-    setToLocation(fromLocation);
-    setIsSwapped((prev) => !prev);
+    setFromLocation((prevFrom) => {
+      setToLocation(prevFrom);   
+      return toLocation;
+    });
   };
 
   return (
@@ -80,101 +81,50 @@ const Hero = () => {
 
             {/* Form Fields */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-              {isSwapped ? (
-                <>
-                  {/* To */}
-                  <div className="space-y-1.5">
-                    <span className="text-sm text-green-600 font-medium uppercase">
-                      To
-                    </span>
-                    <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                      <MapPin className="text-green-500 h-4 w-4 mr-2" />
-                      <Input
-                        placeholder="Destination City"
-                        value={toLocation}
-                        onChange={(e) => setToLocation(e.target.value)}
-                        className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
-                      />
-                    </div>
-                  </div>
+              {/* From */}
+              <div className="space-y-1.5">
+                <span className="text-sm text-green-600 font-medium uppercase">
+                  From
+                </span>
+                <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
+                  <MapPin className="text-green-500 h-4 w-4 mr-2" />
+                  <Input
+                    placeholder="Departure City"
+                    value={fromLocation}
+                    onChange={(e) => setFromLocation(e.target.value)}
+                    className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
+                  />
+                </div>
+              </div>
 
-                  {/* Swap Button */}
-                  <div className="flex justify-center pt-6 md:pt-0">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={swapLocations}
-                      className="h-14 w-14 rounded-full border-gray-300 text-gray-500"
-                    >
-                      <ArrowLeftRight size={22} />
-                    </Button>
-                  </div>
+              {/* Swap Button */}
+              <div className="flex justify-center pt-6 md:pt-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={swapLocations}
+                  className="h-14 w-14 rounded-full border-gray-300 text-gray-500"
+                >
+                  <ArrowLeftRight size={22} />
+                </Button>
+              </div>
 
-                  {/* From */}
-                  <div className="space-y-1.5">
-                    <span className="text-sm text-green-600 font-medium uppercase">
-                      From
-                    </span>
-                    <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                      <MapPin className="text-green-500 h-4 w-4 mr-2" />
-                      <Input
-                        placeholder="Departure City"
-                        value={fromLocation}
-                        onChange={(e) => setFromLocation(e.target.value)}
-                        className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* From */}
-                  <div className="space-y-1.5">
-                    <span className="text-sm text-green-600 font-medium uppercase">
-                      From
-                    </span>
-                    <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                      <MapPin className="text-green-500 h-4 w-4 mr-2" />
-                      <Input
-                        placeholder="Departure City"
-                        value={fromLocation}
-                        onChange={(e) => setFromLocation(e.target.value)}
-                        className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Swap Button */}
-                  <div className="flex justify-center pt-6 md:pt-0">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={swapLocations}
-                      className="h-14 w-14 rounded-full border-gray-300 text-gray-500"
-                    >
-                      <ArrowLeftRight size={22} />
-                    </Button>
-                  </div>
-
-                  {/* To */}
-                  <div className="space-y-1.5">
-                    <span className="text-sm text-green-600 font-medium uppercase">
-                      To
-                    </span>
-                    <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                      <MapPin className="text-green-500 h-4 w-4 mr-2" />
-                      <Input
-                        placeholder="Destination City"
-                        value={toLocation}
-                        onChange={(e) => setToLocation(e.target.value)}
-                        className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+              {/* To */}
+              <div className="space-y-1.5">
+                <span className="text-sm text-green-600 font-medium uppercase">
+                  To
+                </span>
+                <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
+                  <MapPin className="text-green-500 h-4 w-4 mr-2" />
+                  <Input
+                    placeholder="Destination City"
+                    value={toLocation}
+                    onChange={(e) => setToLocation(e.target.value)}
+                    className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
+                  />
+                </div>
+              </div>
 
               {/* Journey Date */}
               <div className="space-y-1.5 relative">

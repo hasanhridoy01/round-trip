@@ -30,7 +30,7 @@ export default function Home() {
       <Hero />
 
       {/* Welcome Section */}
-      <section className="bg-gradient-to-r from-green-500 to-emerald-600 py-12">
+      {/* <section className="bg-gradient-to-r from-green-500 to-emerald-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="text-center lg:text-left mb-6 lg:mb-0">
@@ -52,7 +52,7 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Steps Section */}
       <section className="py-20 bg-white">
