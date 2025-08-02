@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { Bus, Ship, Phone, Menu, Briefcase, Building2 } from "lucide-react";
+import { Bus, Ship, Phone, Menu, Briefcase, Building2, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -17,7 +17,7 @@ const Header = () => {
   const navigationItems = [
     { icon: Bus, label: "Bus", active: false },
     { icon: Ship, label: "Launch", active: true },
-    { icon: Briefcase, label: "Board", active: false },
+    { icon: Briefcase, label: "Boat", active: false },
     { icon: Building2, label: "Hotels", active: false },
   ];
 
@@ -92,14 +92,14 @@ const Header = () => {
                       Account
                     </h3>
                     <LoginDialog />
-                    <Button
+                    {/* <Button
                       variant="ghost"
-                      className="w-full justify-start space-x-3 h-12 hover:bg-gray-50"
+                      className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground border border-gray-300"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Phone size={20} />
                       <span className="font-medium">Call 16374</span>
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </SheetContent>
@@ -108,10 +108,13 @@ const Header = () => {
 
           {/* Desktop Right Side */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" className="flex items-center space-x-2">
+            {/* <Button
+              variant="outline"
+              className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground border border-gray-300"
+            >
               <Phone size={16} />
               <span>16374</span>
-            </Button>
+            </Button> */}
             <LoginDialog />
           </div>
         </div>

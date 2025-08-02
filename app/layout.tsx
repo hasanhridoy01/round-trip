@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={inter.className}>
         {children}
         <CheckOutButton />
-        <Toaster position="top-center" />
+        <Toaster position="top-right" />
       </body>
     </html>
   );

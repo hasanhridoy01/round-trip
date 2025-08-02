@@ -75,8 +75,8 @@ const LoginDialog = () => {
       );
 
       if (!data.success) {
-        toast.error("Search failed", {
-          description: data.message || "Something went wrong",
+        toast.error(data.message, {
+          duration: 5000,
         });
         setPhoneNumber("");
         return;
@@ -85,43 +85,32 @@ const LoginDialog = () => {
       if (data.step === "login") {
         setLoginField(true);
         setNumberFieldDisabled(true);
-        toast.info("Account found", {
-          description: "Please enter your password to continue",
+        toast.success("Customer account found Please login!", {
+          duration: 5000,
         });
       } else if (data.step === "register") {
         setRegistrationField(true);
         setOtpField(false);
         setNumberFieldDisabled(true);
-        toast("Customer account not found", {
-          description: "Please create your account",
-          action: {
-            label: "Sign up",
-            onClick: () => router.push("/signup"),
-          },
+        toast.success("Customer account not found Please create your account!", {
+          duration: 5000,
         });
       } else if (data.step === "otp") {
         setOtpField(true);
         setRegistrationField(false);
         setNumberFieldDisabled(true);
-        toast("Customer account not found", {
-          description: "Please create your account",
-          action: {
-            label: "OTP",
-            onClick: () => router.push("/otp"),
-          },
+        toast.success("Please check your mobile number!", {
+          duration: 5000,
         });
       } else {
-        toast.warning("Unexpected response", {
-          description: data.message || "Unknown step from server",
+        toast.error(data.message, {
+          duration: 5000,
         });
       }
     } catch (error: any) {
       console.error("Search error:", error);
-      toast.error("Search failed", {
-        description:
-          error.response?.data?.message ||
-          error.message ||
-          "An error occurred while searching",
+      toast.error(error.response?.data?.message, {
+        duration: 5000,
       });
       setPhoneNumber("");
     } finally {
@@ -193,7 +182,10 @@ const LoginDialog = () => {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button variant="outline" className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground">
+        <Button
+          variant="outline"
+          className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground"
+        >
           <User size={16} />
           <span>Login</span>
         </Button>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Trash2 } from "lucide-react";
 import {
   Drawer,
   DrawerTrigger,
@@ -14,11 +14,120 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 
+interface BookingDetail {
+  label: string;
+  value: string;
+}
+
+interface Booking {
+  id: number;
+  type: string;
+  details: BookingDetail[];
+}
+
+const bookingData: Booking[] = [
+  {
+    id: 1,
+    type: "🏨 Hotel Booking",
+    details: [
+      { label: "Hotel", value: "Grand Palace" },
+      { label: "Check-in", value: "Aug 10, 2025" },
+      { label: "Nights", value: "3" },
+    ],
+  },
+  {
+    id: 2,
+    type: "✈️ Flight Booking",
+    details: [
+      { label: "From", value: "Dhaka" },
+      { label: "To", value: "Dubai" },
+      { label: "Date", value: "Aug 10, 2025" },
+    ],
+  },
+  {
+    id: 3,
+    type: "🍽️ Lunch Booking",
+    details: [
+      { label: "Restaurant", value: "Spice Garden" },
+      { label: "Time", value: "1:00 PM" },
+      { label: "Date", value: "Aug 11, 2025" },
+    ],
+  },
+  {
+    id: 4,
+    type: "🏨 Hotel Booking",
+    details: [
+      { label: "Hotel", value: "Royal Suites" },
+      { label: "Check-in", value: "Aug 12, 2025" },
+      { label: "Nights", value: "2" },
+    ],
+  },
+  {
+    id: 5,
+    type: "✈️ Flight Booking",
+    details: [
+      { label: "From", value: "Dubai" },
+      { label: "To", value: "Maldives" },
+      { label: "Date", value: "Aug 15, 2025" },
+    ],
+  },
+  {
+    id: 6,
+    type: "🚗 Car Rental",
+    details: [
+      { label: "Company", value: "Hertz" },
+      { label: "Type", value: "SUV" },
+      { label: "Days", value: "5" },
+    ],
+  },
+  {
+    id: 7,
+    type: "🏨 Hotel Booking",
+    details: [
+      { label: "Hotel", value: "Beach Resort" },
+      { label: "Check-in", value: "Aug 15, 2025" },
+      { label: "Nights", value: "7" },
+    ],
+  },
+  {
+    id: 8,
+    type: "✈️ Flight Booking",
+    details: [
+      { label: "From", value: "Maldives" },
+      { label: "To", value: "Dhaka" },
+      { label: "Date", value: "Aug 22, 2025" },
+    ],
+  },
+  {
+    id: 9,
+    type: "🍽️ Dinner Booking",
+    details: [
+      { label: "Restaurant", value: "Ocean View" },
+      { label: "Time", value: "8:00 PM" },
+      { label: "Date", value: "Aug 18, 2025" },
+    ],
+  },
+  {
+    id: 10,
+    type: "🚤 Boat Tour",
+    details: [
+      { label: "Tour", value: "Sunset Cruise" },
+      { label: "Duration", value: "2 hours" },
+      { label: "Date", value: "Aug 19, 2025" },
+    ],
+  },
+];
+
 const CheckOutButton = () => {
-  const [checkoutCount, setCheckoutCount] = useState(0);
+  const [checkoutCount, setCheckoutCount] = useState<number>(0);
+  const [bookings, setBookings] = useState<Booking[]>(bookingData);
 
   const handleCheckout = () => {
     setCheckoutCount((prev) => prev + 1);
+  };
+
+  const handleDelete = (id: number) => {
+    setBookings(bookings.filter((booking) => booking.id !== id));
   };
 
   return (
@@ -39,7 +148,6 @@ const CheckOutButton = () => {
         </DrawerTrigger>
 
         <DrawerContent className="p-0">
-          {/* Fixed Top Header */}
           <div className="sticky top-0 z-10 bg-white border-b px-6 py-4">
             <DrawerHeader className="p-0">
               <DrawerTitle>Checkout Summary</DrawerTitle>
@@ -50,103 +158,50 @@ const CheckOutButton = () => {
             </DrawerHeader>
           </div>
 
-          {/* Scrollable Booking Cards */}
-          <div className="overflow-y-auto max-h-[calc(100vh-160px)] px-6 py-4 space-y-4">
-            {/* Hotel Booking */}
-            <div className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer">
-              <h3 className="font-semibold text-base mb-2">🏨 Hotel Booking</h3>
-              <p>
-                <span className="font-medium">Hotel:</span> Grand Palace
-              </p>
-              <p>
-                <span className="font-medium">Check-in:</span> Aug 10, 2025
-              </p>
-              <p>
-                <span className="font-medium">Nights:</span> 3
-              </p>
-            </div>
-
-            {/* Flight Booking */}
-            <div className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer">
-              <h3 className="font-semibold text-base mb-2">
-                ✈️ Flight Booking
-              </h3>
-              <p>
-                <span className="font-medium">From:</span> Dhaka
-              </p>
-              <p>
-                <span className="font-medium">To:</span> Dubai
-              </p>
-              <p>
-                <span className="font-medium">Date:</span> Aug 10, 2025
-              </p>
-            </div>
-
-            {/* Lunch Booking */}
-            <div className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer">
-              <h3 className="font-semibold text-base mb-2">🍽️ Lunch Booking</h3>
-              <p>
-                <span className="font-medium">Restaurant:</span> Spice Garden
-              </p>
-              <p>
-                <span className="font-medium">Time:</span> 1:00 PM
-              </p>
-              <p>
-                <span className="font-medium">Date:</span> Aug 11, 2025
-              </p>
-            </div>
-
-            {/* Hotel Booking */}
-            <div className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer">
-              <h3 className="font-semibold text-base mb-2">🏨 Hotel Booking</h3>
-              <p>
-                <span className="font-medium">Hotel:</span> Grand Palace
-              </p>
-              <p>
-                <span className="font-medium">Check-in:</span> Aug 10, 2025
-              </p>
-              <p>
-                <span className="font-medium">Nights:</span> 3
-              </p>
-            </div>
-
-            {/* Flight Booking */}
-            <div className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer">
-              <h3 className="font-semibold text-base mb-2">
-                ✈️ Flight Booking
-              </h3>
-              <p>
-                <span className="font-medium">From:</span> Dhaka
-              </p>
-              <p>
-                <span className="font-medium">To:</span> Dubai
-              </p>
-              <p>
-                <span className="font-medium">Date:</span> Aug 10, 2025
-              </p>
-            </div>
-
-            {/* Lunch Booking */}
-            <div className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer">
-              <h3 className="font-semibold text-base mb-2">🍽️ Lunch Booking</h3>
-              <p>
-                <span className="font-medium">Restaurant:</span> Spice Garden
-              </p>
-              <p>
-                <span className="font-medium">Time:</span> 1:00 PM
-              </p>
-              <p>
-                <span className="font-medium">Date:</span> Aug 11, 2025
-              </p>
-            </div>
+          <div className="overflow-y-auto min-h-[calc(100vh-160px)] px-6 py-4 flex flex-col">
+            {bookings.length > 0 ? (
+              <div className="space-y-4">
+                {bookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer relative"
+                  >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(booking.id);
+                      }}
+                      className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    <h3 className="font-semibold text-base mb-2">
+                      {booking.type}
+                    </h3>
+                    {booking.details.map((detail, i) => (
+                      <p key={i}>
+                        <span className="font-medium">{detail.label}:</span>{" "}
+                        {detail.value}
+                      </p>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-center text-gray-500">No bookings found.</p>
+              </div>
+            )}
           </div>
 
-          {/* Fixed Bottom Footer */}
           <div className="sticky bottom-0 z-10 bg-white border-t px-6 py-4">
             <DrawerFooter className="p-0 flex gap-2">
-              <Button className="w-full">Submit</Button>
+              <Button className="w-full hover:bg-secondary">Submit</Button>
               <DrawerClose className="w-full">
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground border border-gray-300 w-full"
+                >
                   Cancel
                 </Button>
               </DrawerClose>

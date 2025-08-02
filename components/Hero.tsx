@@ -9,7 +9,7 @@ type TabBackgrounds = {
   bus: string;
   launch: string;
   hotel: string;
-  board: string;
+  boat: string;
   default: string;
 };
 
@@ -24,8 +24,7 @@ const Hero = () => {
         'url("https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg")',
       hotel:
         'url("https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg")',
-      board:
-        'url("https://images.pexels.com/photos/380769/pexels-photo-380769.jpeg")',
+      boat: 'url("https://images.pexels.com/photos/380769/pexels-photo-380769.jpeg")',
       default:
         'url("https://images.pexels.com/photos/46148/aircraft-jet-landing-cloud-46148.jpeg")',
     };
@@ -77,8 +76,8 @@ const Hero = () => {
               <TabsTrigger value="launch" className="bg-white text-black">
                 <Ship size={18} /> Launch
               </TabsTrigger>
-              <TabsTrigger value="board" className="bg-white text-black">
-                <Briefcase size={18} /> Board
+              <TabsTrigger value="boat" className="bg-white text-black">
+                <Briefcase size={18} /> Boat
               </TabsTrigger>
               <TabsTrigger value="hotel" className="bg-white text-black">
                 <Building2 size={18} /> Hotels
@@ -92,7 +91,7 @@ const Hero = () => {
             <TabsContent value="launch">
               <LaunchComponent />
             </TabsContent>
-            <TabsContent value="board">
+            <TabsContent value="boat">
               <BusComponent />
             </TabsContent>
             <TabsContent value="hotel">
