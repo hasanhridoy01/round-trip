@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 
-const HotelComponent = () => {
+const BusComponent = () => {
   const [tripType, setTripType] = React.useState<"oneWay" | "roundTrip">(
     "oneWay"
   );
@@ -53,7 +53,7 @@ const HotelComponent = () => {
               value="oneWay"
               checked={tripType === "oneWay"}
               onChange={handleChange}
-              className="accent-green-600 w-4 h-4"
+              className="accent-primary w-4 h-4"
             />
             <span className="font-normal text-black uppercase">One Way</span>
           </label>
@@ -64,7 +64,7 @@ const HotelComponent = () => {
               value="roundTrip"
               checked={tripType === "roundTrip"}
               onChange={handleChange}
-              className="accent-green-600 w-4 h-4"
+              className="accent-primary w-4 h-4"
             />
             <span className="font-normal text-black uppercase">Round Way</span>
           </label>
@@ -74,11 +74,11 @@ const HotelComponent = () => {
         <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
           {/* From */}
           <div className="md:col-span-2 space-y-1.5">
-            <span className="text-sm text-green-600 font-medium uppercase">
+            <span className="text-sm text-primary font-medium uppercase">
               From
             </span>
             <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-              <MapPin className="text-green-500 h-4 w-4 mr-2" />
+              <MapPin className="text-primary h-4 w-4 mr-2" />
               <Input
                 placeholder="Departure City"
                 value={fromLocation}
@@ -103,11 +103,11 @@ const HotelComponent = () => {
 
           {/* To */}
           <div className="md:col-span-2 space-y-1.5">
-            <span className="text-sm text-green-600 font-medium uppercase">
+            <span className="text-sm text-primary font-medium uppercase">
               To
             </span>
             <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-              <MapPin className="text-green-500 h-4 w-4 mr-2" />
+              <MapPin className="text-primary h-4 w-4 mr-2" />
               <Input
                 placeholder="Destination City"
                 value={toLocation}
@@ -119,11 +119,11 @@ const HotelComponent = () => {
 
           {/* Journey Date */}
           <div className="md:col-span-2   space-y-1.5 relative">
-            <span className="text-sm text-green-600 font-medium uppercase">
+            <span className="text-sm text-primary font-medium uppercase">
               Journey Date
             </span>
             <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-              <Calendar className="text-green-500 h-4 w-4 mr-2" />
+              <Calendar className="text-primary h-4 w-4 mr-2" />
               <Input
                 type="date"
                 value={journeyDate}
@@ -135,11 +135,11 @@ const HotelComponent = () => {
 
           {tripType === "roundTrip" && (
             <div className="md:col-span-2 space-y-1.5 mt-4">
-              <span className="text-sm text-green-600 font-medium uppercase">
+              <span className="text-sm text-primary font-medium uppercase">
                 Return Date
               </span>
               <div className="bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                <Calendar className="text-green-500 h-4 w-4 mr-2" />
+                <Calendar className="text-primary h-4 w-4 mr-2" />
                 <Input
                   type="date"
                   value={returnDate}
@@ -159,7 +159,7 @@ const HotelComponent = () => {
             <Button
               className={`${
                 tripType === "roundTrip" ? "h-14" : "h-14"
-              } w-full bg-green-600 hover:bg-green-700 text-white text-lg font-medium rounded-md`}
+              } w-full bg-primary hover:bg-primary/80 text-white text-lg font-medium rounded-md`}
             >
               SEARCH
             </Button>
@@ -170,4 +170,4 @@ const HotelComponent = () => {
   );
 };
 
-export default HotelComponent;
+export default BusComponent;

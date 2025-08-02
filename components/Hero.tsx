@@ -1,39 +1,51 @@
 import React, { useState } from "react";
-import Link from "next/link";
-import { Hotel, Umbrella, BadgeCheck, Plane } from "lucide-react";
-
+import { Bus, Ship, Briefcase, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import HotelComponent from "./search-components/Hotel";
-import FlightComponent from "./search-components/Flight";
+import BusComponent from "./search-components/Bus";
+import LaunchComponent from "./search-components/Launch";
+
+type TabBackgrounds = {
+  [key: string]: string;
+  bus: string;
+  launch: string;
+  hotel: string;
+  board: string;
+  default: string;
+};
 
 const Hero = () => {
-  const [activeTab, setActiveTab] = useState("flight");
+  const [activeTab, setActiveTab] = useState<keyof TabBackgrounds>("launch");
 
-  const getBackgroundClass = () => {
-    switch (activeTab) {
-      case "hotel":
-        return "bg-gradient-to-r from-amber-600 via-orange-600 to-amber-800";
-      case "holidays":
-        return "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800";
-      case "visa":
-        return "bg-gradient-to-r from-violet-600 via-purple-600 to-violet-800";
-      case "flight":
+  // Define background images for each tab
+  const getBackgroundImage = (): string => {
+    const backgrounds: TabBackgrounds = {
+      bus: 'url("https://images.pexels.com/photos/128756/pexels-photo-128756.jpeg")',
+      launch:
+        'url("https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg")',
+      hotel:
+        'url("https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg")',
+      board:
+        'url("https://images.pexels.com/photos/380769/pexels-photo-380769.jpeg")',
       default:
-        return "bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800";
-    }
+        'url("https://images.pexels.com/photos/46148/aircraft-jet-landing-cloud-46148.jpeg")',
+    };
+
+    return backgrounds[activeTab] || backgrounds.default;
   };
 
+  const backgroundImage = getBackgroundImage();
+
   return (
-    <section
-      className={`relative ${getBackgroundClass()} md:pt-8 pt-14 pb-24 md:h-[350px] h-screen`}
-    >
-      {/* Background elements remain the same */}
+    <section className="relative md:pt-8 pt-14 pb-24 md:h-[350px] h-screen">
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black opacity-20"></div>
+
+      {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            'url("https://images.pexels.com/photos/1118448/pexels-photo-1118448.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")',
+          backgroundImage: backgroundImage,
+          opacity: 1,
         }}
       ></div>
 
@@ -53,38 +65,38 @@ const Hero = () => {
       <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 pt-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs
-            defaultValue="flight"
-            onValueChange={(value) => setActiveTab(value)}
+            defaultValue="launch"
+            onValueChange={(value) =>
+              setActiveTab(value as keyof TabBackgrounds)
+            }
           >
             <TabsList className="w-full mx-auto flex-wrap gap-1 bg-transparent">
-              <TabsTrigger value="flight" className="bg-white">
-                <Plane size={18} /> Flight
+              <TabsTrigger value="bus" className="bg-white text-black">
+                <Bus size={18} /> Bus
               </TabsTrigger>
-              <TabsTrigger value="hotel" className="bg-white">
-                <Hotel size={18} /> Hotel
+              <TabsTrigger value="launch" className="bg-white text-black">
+                <Ship size={18} /> Launch
               </TabsTrigger>
-              <TabsTrigger value="holidays" className="bg-white">
-                <Umbrella size={18} /> Holidays
+              <TabsTrigger value="board" className="bg-white text-black">
+                <Briefcase size={18} /> Board
               </TabsTrigger>
-              <TabsTrigger value="visa" className="bg-white">
-                <BadgeCheck size={18} /> Visa
+              <TabsTrigger value="hotel" className="bg-white text-black">
+                <Building2 size={18} /> Hotels
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="flight">
-              <FlightComponent />
+            {/* Tab contents remain the same */}
+            <TabsContent value="bus">
+              <BusComponent />
             </TabsContent>
-
+            <TabsContent value="launch">
+              <LaunchComponent />
+            </TabsContent>
+            <TabsContent value="board">
+              <BusComponent />
+            </TabsContent>
             <TabsContent value="hotel">
-              <HotelComponent />
-            </TabsContent>
-
-            <TabsContent value="holidays">
-              <FlightComponent />
-            </TabsContent>
-
-            <TabsContent value="visa">
-              <FlightComponent />
+              <BusComponent />
             </TabsContent>
           </Tabs>
         </div>

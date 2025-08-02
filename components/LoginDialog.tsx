@@ -193,7 +193,7 @@ const LoginDialog = () => {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button variant="outline" className="flex items-center space-x-2">
+        <Button variant="outline" className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground">
           <User size={16} />
           <span>Login</span>
         </Button>
@@ -294,7 +294,7 @@ const LoginDialog = () => {
                         </div>
                         <Link
                           href="/forgot-password"
-                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-sm text-primary/90 hover:text-blue-800 font-medium"
                         >
                           Forgot password?
                         </Link>
@@ -305,7 +305,7 @@ const LoginDialog = () => {
                         onClick={handleLogin}
                         disabled={password.trim() === ""}
                         type="submit"
-                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                        className="w-full h-12 bg-gradient-to-r from-primary/90 to-primary/50 hover:from-primary hover:to-primary/30 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                       >
                         Sign In
                       </Button>
@@ -347,7 +347,7 @@ const LoginDialog = () => {
                         onClick={handleSendOtp}
                         disabled={otp.length !== 6}
                         type="submit"
-                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                        className="w-full h-12 bg-gradient-to-r from-primary/90 to-primary/50 hover:from-primary hover:to-primary/30 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                       >
                         Confirm
                       </Button>
@@ -500,7 +500,7 @@ const LoginDialog = () => {
                         onClick={handleLogin}
                         disabled={password.trim() === ""}
                         type="submit"
-                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                        className="w-full h-12 bg-gradient-to-r from-primary/90 to-primary/50 hover:from-primary hover:to-primary/30 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                       >
                         Sign Up
                       </Button>
@@ -512,7 +512,7 @@ const LoginDialog = () => {
                       onClick={handleSearchNumber}
                       disabled={phoneNumber.trim() === ""}
                       type="submit"
-                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                      className="w-full h-12 bg-gradient-to-r from-primary/90 to-primary/50 hover:from-primary hover:to-primary/30 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                     >
                       Search
                     </Button>
