@@ -85,33 +85,23 @@ const LoginDialog = () => {
       if (data.step === "login") {
         setLoginField(true);
         setNumberFieldDisabled(true);
-        toast.success("Customer account found Please login!", {
-          duration: 5000,
-        });
+        toast.success("Customer account found Please login!");
       } else if (data.step === "register") {
         setRegistrationField(true);
         setOtpField(false);
         setNumberFieldDisabled(true);
-        toast.success("Customer account not found Please create your account!", {
-          duration: 5000,
-        });
+        toast.success("Customer account not found Please create your account!");
       } else if (data.step === "otp") {
         setOtpField(true);
         setRegistrationField(false);
         setNumberFieldDisabled(true);
-        toast.success("Please check your mobile number!", {
-          duration: 5000,
-        });
+        toast.success("Please check your mobile number!");
       } else {
-        toast.error(data.message, {
-          duration: 5000,
-        });
+        toast.error(data.message);
       }
     } catch (error: any) {
       console.error("Search error:", error);
-      toast.error(error.response?.data?.message, {
-        duration: 5000,
-      });
+      toast.error(error.response?.data?.message);
       setPhoneNumber("");
     } finally {
       setIsLoading(false);
