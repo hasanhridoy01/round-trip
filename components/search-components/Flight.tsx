@@ -32,6 +32,11 @@ const FlightComponent = () => {
   const [journeyDate, setJourneyDate] = React.useState("");
   const [returnDate, setReturnDate] = React.useState("");
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value as "oneWay" | "roundTrip";
+    setTripType(value);
+  };
+
   const swapLocations = () => {
     setFromLocation(toLocation);
     setToLocation(fromLocation);
@@ -47,7 +52,7 @@ const FlightComponent = () => {
               name="tripType"
               value="oneWay"
               checked={tripType === "oneWay"}
-              onChange={(e) => setTripType(e.target.value)}
+              onChange={handleChange}
               className="accent-green-600 w-4 h-4"
             />
             <span className="font-normal text-black uppercase">One Way</span>
@@ -58,7 +63,7 @@ const FlightComponent = () => {
               name="tripType"
               value="roundTrip"
               checked={tripType === "roundTrip"}
-              onChange={(e) => setTripType(e.target.value)}
+              onChange={handleChange}
               className="accent-green-600 w-4 h-4"
             />
             <span className="font-normal text-black uppercase">Round Way</span>

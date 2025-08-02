@@ -79,9 +79,13 @@ const Hero = () => {
               <HotelComponent />
             </TabsContent>
 
-            <TabsContent value="holidays"></TabsContent>
+            <TabsContent value="holidays">
+              <FlightComponent />
+            </TabsContent>
 
-            <TabsContent value="visa"></TabsContent>
+            <TabsContent value="visa">
+              <FlightComponent />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
