@@ -27,6 +27,12 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,7 +49,8 @@ export default function LoginPage() {
   const [registrationField, setRegistrationField] = useState(false);
   const [OtpField, setOtpField] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  // Phone Number Functions
+  const handleSearchNumber = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -113,6 +120,38 @@ export default function LoginPage() {
     }
   };
 
+  // OTP Functions
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/otp`,
+        { mobile: phoneNumber },
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
+
+      if (data.success) {
+        toast.success("OTP sent successfully");
+      } else {
+        throw new Error(data.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      console.error("OTP error:", error);
+      toast.error("OTP failed", {
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "An error occurred while sending OTP",
+      });
+      setPhoneNumber("");
+    } finally {
+      setIsLoading(false);
+    }
+  };    
+
+  // Login Functions
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -201,7 +240,11 @@ export default function LoginPage() {
                       placeholder="Enter your phone number"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      className={`pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 ${numberFieldDisabled ? "cursor-not-allowed border border-red-500" : ""}`}
+                      className={`pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 ${
+                        numberFieldDisabled
+                          ? "cursor-not-allowed border border-red-500"
+                          : ""
+                      }`}
                       required
                     />
                   </div>
@@ -270,6 +313,7 @@ export default function LoginPage() {
                     {/* Login Button */}
                     <Button
                       onClick={handleLogin}
+                      disabled={password.trim() === ""}
                       type="submit"
                       className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
                     >
@@ -279,25 +323,40 @@ export default function LoginPage() {
                 )}
 
                 {OtpField && (
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="otp"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      OTP
-                    </Label>
-                    <div className="relative">
-                      <Key className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="otp"
-                        type="number"
-                        placeholder="Enter your OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                        required
-                      />
+                  <div>
+                    <div className="space-y-2 mb-5">
+                      <Label
+                        htmlFor="otp"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        OTP
+                      </Label>
+                      <div className="flex items-center justify-center">
+                        <div className="relative">
+                          <InputOTP maxLength={6} onChange={setOtp} value={otp}>
+                            <InputOTPGroup>
+                              <InputOTPSlot index={0} />
+                              <InputOTPSlot index={1} />
+                              <InputOTPSlot index={2} />
+                            </InputOTPGroup>
+                            <InputOTPSeparator />
+                            <InputOTPGroup>
+                              <InputOTPSlot index={3} />
+                              <InputOTPSlot index={4} />
+                              <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
+                      </div>
                     </div>
+                    <Button
+                      onClick={handleSendOtp}
+                      disabled={otp.length !== 6}
+                      type="submit"
+                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                    >
+                      Confirm
+                    </Button>
                   </div>
                 )}
 
@@ -445,13 +504,16 @@ export default function LoginPage() {
                   </>
                 )}
 
-                <Button
-                  onClick={handleSearch}
-                  type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                >
-                  Search
-                </Button>
+                {loginField || registrationField || OtpField ? null : (
+                  <Button
+                    onClick={handleSearchNumber}
+                    disabled={phoneNumber.trim() === ""}
+                    type="submit"
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  >
+                    Search
+                  </Button>
+                )}
               </div>
 
               {/* Divider */}

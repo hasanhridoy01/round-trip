@@ -25,6 +25,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import LoginDialog from "./LoginDialog";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,11 +61,6 @@ const Header = () => {
               >
                 <item.icon size={20} />
                 <span>{item.label}</span>
-                {item.beta && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 rounded">
-                    BETA
-                  </span>
-                )}
               </Button>
             ))}
           </nav>
@@ -105,11 +101,6 @@ const Header = () => {
                       >
                         <item.icon size={20} />
                         <span className="font-medium">{item.label}</span>
-                        {item.beta && (
-                          <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded">
-                            BETA
-                          </span>
-                        )}
                       </Button>
                     ))}
                   </div>
@@ -119,7 +110,7 @@ const Header = () => {
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
                       Account
                     </h3>
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       className="w-full justify-start space-x-3 h-12 hover:bg-gray-50"
                       asChild
@@ -129,7 +120,8 @@ const Header = () => {
                         <User size={20} />
                         <span className="font-medium">Login / Sign Up</span>
                       </Link>
-                    </Button>
+                    </Button> */}
+                    <LoginDialog />
                     <Button
                       variant="ghost"
                       className="w-full justify-start space-x-3 h-12 hover:bg-gray-50"
@@ -166,16 +158,7 @@ const Header = () => {
               <Phone size={16} />
               <span>16374</span>
             </Button>
-            <Button
-              variant="outline"
-              className="flex items-center space-x-2"
-              asChild
-            >
-              <Link href="/login">
-                <User size={16} />
-                <span>Login</span>
-              </Link>
-            </Button>
+            <LoginDialog />
           </div>
         </div>
       </div>
