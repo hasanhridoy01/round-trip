@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import { Bus, Ship, Phone, Menu, Briefcase, Building2, } from "lucide-react";

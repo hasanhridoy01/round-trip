@@ -158,7 +158,7 @@ const CheckOutButton = () => {
             </DrawerHeader>
           </div>
 
-          <div className="overflow-y-auto min-h-[calc(100vh-160px)] px-6 py-4 flex flex-col">
+          <div className="overflow-y-auto min-h-[calc(100vh-205px)] px-6 py-4 flex flex-col">
             {bookings.length > 0 ? (
               <div className="space-y-4">
                 {bookings.map((booking) => (

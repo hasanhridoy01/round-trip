@@ -159,7 +159,7 @@ const BusComponent = () => {
             </div>
 
             {tripType === "roundTrip" && (
-              <div className="md:col-span-2 space-y-1.5 mt-4">
+              <div className="md:col-span-2 space-y-1.5">
                 <span className="text-sm text-primary font-medium uppercase">
                   Return Date
                 </span>

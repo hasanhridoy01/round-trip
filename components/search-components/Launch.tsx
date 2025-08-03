@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -7,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { set } from "date-fns";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const LaunchComponent = () => {
+  const router = useRouter();
   const [tripType, setTripType] = React.useState<"oneWay" | "roundTrip">(
     "oneWay"
   );
@@ -40,6 +44,7 @@ const LaunchComponent = () => {
         trip_to: toLocation,
         type: trip,
       });
+
       if (tripType === "roundTrip" && returnDate) {
         params.append("return_trip_date", returnDate);
       }
@@ -51,17 +56,34 @@ const LaunchComponent = () => {
       );
 
       console.log("Search Result:", response.data);
-      if (response.data.success) {
+
+      if (response.data.success && Array.isArray(response.data.data)) {
+        const firstTrip = response.data.data[0];
+
         toast.success(`Search successful for ${trip} trips`);
+
+        // Clear form
         setFromLocation("");
         setToLocation("");
         setJourneyDate("");
         setReturnDate("");
+
+        // ✅ Push to route with query
+        router.push(
+          `/tickets/booking/search?fromcity=${
+            firstTrip.starting_point
+          }&tocity=${firstTrip.ending_point}&doj=${
+            firstTrip.schedule_date
+          }&dor=${tripType === "roundTrip" ? returnDate : ""}`
+        );
+      } else {
+        toast.error("No trips found");
       }
     } catch (error) {
       console.error("Error searching trips:", error);
       toast.error("Search failed");
     }
+
     setLoading(false);
   };
 
@@ -159,7 +181,7 @@ const LaunchComponent = () => {
             </div>
 
             {tripType === "roundTrip" && (
-              <div className="md:col-span-2 space-y-1.5 mt-4">
+              <div className="md:col-span-2 space-y-1.5">
                 <span className="text-sm text-primary font-medium uppercase">
                   Return Date
                 </span>
