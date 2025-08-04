@@ -10,9 +10,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { set } from "date-fns";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useSearch } from "@/context/SearchContext";
+
 
 const LaunchComponent = () => {
   const router = useRouter();
+  const { setResults } = useSearch();
   const [tripType, setTripType] = React.useState<"oneWay" | "roundTrip">(
     "oneWay"
   );
@@ -55,10 +58,7 @@ const LaunchComponent = () => {
         }/api/v2/search?${params.toString()}`
       );
 
-      console.log("Search Result:", response.data);
-
       if (response.data.success && Array.isArray(response.data.data)) {
-        const firstTrip = response.data.data[0];
 
         toast.success(`Search successful for ${trip} trips`);
 
@@ -69,12 +69,9 @@ const LaunchComponent = () => {
         setReturnDate("");
 
         // ✅ Push to route with query
+        setResults(response.data.data);
         router.push(
-          `/tickets/booking/search?fromcity=${
-            firstTrip.starting_point
-          }&tocity=${firstTrip.ending_point}&doj=${
-            firstTrip.schedule_date
-          }&dor=${tripType === "roundTrip" ? returnDate : ""}`
+          `/tickets/booking/search?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
         );
       } else {
         toast.error("No trips found");

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import axios from "axios";
@@ -7,8 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { set } from "date-fns";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useSearch } from "@/context/SearchContext";
 
 const BusComponent = () => {
+  const router = useRouter();
+  const { setResults } = useSearch();
   const [tripType, setTripType] = React.useState<"oneWay" | "roundTrip">(
     "oneWay"
   );
@@ -40,6 +46,7 @@ const BusComponent = () => {
         trip_to: toLocation,
         type: trip,
       });
+
       if (tripType === "roundTrip" && returnDate) {
         params.append("return_trip_date", returnDate);
       }
@@ -50,18 +57,28 @@ const BusComponent = () => {
         }/api/v2/search?${params.toString()}`
       );
 
-      console.log("Search Result:", response.data.success);
-      if (response.data.success) {
+      if (response.data.success && Array.isArray(response.data.data)) {
         toast.success(`Search successful for ${trip} trips`);
+
+        // Clear form
         setFromLocation("");
         setToLocation("");
         setJourneyDate("");
         setReturnDate("");
+
+        // ✅ Push to route with query
+        setResults(response.data.data);
+        router.push(
+          `/tickets/booking/search?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
+        );
+      } else {
+        toast.error("No trips found");
       }
     } catch (error) {
       console.error("Error searching trips:", error);
       toast.error("Search failed");
     }
+
     setLoading(false);
   };
 

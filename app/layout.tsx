@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import CheckOutButton from "@/components/CheckOutButton";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SearchProvider } from "@/context/SearchContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,9 +21,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Header />
-        {children}
+        <main className="flex-grow">
+          <SearchProvider>
+          {children}
+          </SearchProvider>
+          </main>
         <CheckOutButton />
         <Toaster position="top-right" />
         <Footer />
