@@ -60,6 +60,7 @@ function DefaultIcon() {
   );
 }
 
+
 export default function SearchResults({ searchParams }: SearchPageProps) {
   const { results } = useSearch();
   const { setBookingData } = useBookingContext();

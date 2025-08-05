@@ -69,7 +69,7 @@ const BusComponent = () => {
         // ✅ Push to route with query
         setResults(response.data.data);
         router.push(
-          `/bus?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
+          `/busBooking/bus/type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
         );
       } else {
         toast.error("No trips found");

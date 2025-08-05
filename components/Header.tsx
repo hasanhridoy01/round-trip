@@ -19,8 +19,8 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
-    { icon: Bus, label: "Bus", link: "/bus" },
-    { icon: Ship, label: "Launch", link: "/launch" },
+    { icon: Bus, label: "Bus", link: "busBooking/bus" },
+    { icon: Ship, label: "Launch", link: "launchBooking/launch" },
     { icon: Briefcase, label: "Boat", link: "/boat" },
     { icon: Building2, label: "Hotels", link: "/hotels" },
   ];
