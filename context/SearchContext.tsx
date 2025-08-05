@@ -1,5 +1,11 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+} from "react";
 
 interface TripResult {
   trip_id: number;
@@ -7,6 +13,7 @@ interface TripResult {
   schedule_date: string;
   starting_point: string;
   ending_point: string;
+  // add more as needed
 }
 
 interface SearchContextType {
@@ -14,33 +21,28 @@ interface SearchContextType {
   setResults: (data: TripResult[]) => void;
 }
 
-const SearchContext = createContext<SearchContextType>({
-  results: [],
-  setResults: () => {},
-});
+const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
-export const useSearch = () => useContext(SearchContext);
+export const useSearch = (): SearchContextType => {
+  const context = useContext(SearchContext);
+  if (!context) {
+    throw new Error("useSearch must be used within a SearchProvider");
+  }
+  return context;
+};
 
-export const SearchProvider = ({ children }: { children: React.ReactNode }) => {
-  const [results, setResultsState] = useState<TripResult[]>([]);
+interface SearchProviderProps {
+  children: ReactNode;
+}
 
-  // Load from localStorage on first mount
-  useEffect(() => {
-    const saved = localStorage.getItem("tripResults");
-    if (saved) {
-      setResultsState(JSON.parse(saved));
-    }
-  }, []);
+export const SearchProvider = ({
+  children,
+}: SearchProviderProps): JSX.Element => {
+  const [results, setResults] = useState<TripResult[]>([]);
 
-  // Save to localStorage on changes
-  const setResults = (data: TripResult[]) => {
-    localStorage.setItem("tripResults", JSON.stringify(data));
-    setResultsState(data);
-  };
+  const value = useMemo(() => ({ results, setResults }), [results]);
 
   return (
-    <SearchContext.Provider value={{ results, setResults }}>
-      {children}
-    </SearchContext.Provider>
+    <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
   );
 };

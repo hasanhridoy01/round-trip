@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Bus, Ship, Phone, Menu, Briefcase, Building2, } from "lucide-react";
+import { Bus, Ship, Phone, Menu, Briefcase, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,15 +12,17 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import LoginDialog from "./LoginDialog";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
-    { icon: Bus, label: "Bus", active: false },
-    { icon: Ship, label: "Launch", active: true },
-    { icon: Briefcase, label: "Boat", active: false },
-    { icon: Building2, label: "Hotels", active: false },
+    { icon: Bus, label: "Bus", link: "/bus" },
+    { icon: Ship, label: "Launch", link: "/launch" },
+    { icon: Briefcase, label: "Boat", link: "/boat" },
+    { icon: Building2, label: "Hotels", link: "/hotels" },
   ];
 
   return (
@@ -28,24 +30,28 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-lg font-bold text-blue-600">
             Travel<span className="text-purple-600">Hub</span>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
-            {navigationItems.map((item) => (
-              <Button
-                key={item.label}
-                variant="ghost"
-                className={`flex items-center w-full justify-start space-x-2 hover:bg-primary/10 ${
-                  item.active ? "text-primary bg-primary/10" : ""
-                }`}
-              >
-                <item.icon size={20} />
-                <span>{item.label}</span>
-              </Button>
-            ))}
+            {navigationItems.map((item) => {
+              const isActive = pathname === item.link;
+
+              return (
+                <Button
+                  key={item.label}
+                  variant="ghost"
+                  className={`flex items-center w-full justify-start space-x-2 hover:bg-primary/10 ${
+                    isActive ? "text-primary bg-primary/10" : ""
+                  }`}
+                >
+                  <item.icon size={20} />
+                  <Link href={item.link}>{item.label}</Link>
+                </Button>
+              );
+            })}
           </nav>
 
           {/* Mobile Menu */}
@@ -71,21 +77,27 @@ const Header = () => {
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
                       Services
                     </h3>
-                    {navigationItems.map((item) => (
-                      <Button
-                        key={item.label}
-                        variant="ghost"
-                        className={`w-full justify-start space-x-3 h-12 ${
-                          item.active
-                            ? "bg-blue-50 text-blue-600"
-                            : "hover:bg-gray-50"
-                        }`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <item.icon size={20} />
-                        <span className="font-medium">{item.label}</span>
-                      </Button>
-                    ))}
+                    {navigationItems.map((item) => {
+                      const isActive = pathname === item.link;
+
+                      return (
+                        <Button
+                          key={item.label}
+                          variant="ghost"
+                          className={`w-full justify-start space-x-3 h-12 ${
+                            isActive
+                              ? "bg-blue-50 text-blue-600"
+                              : "hover:bg-gray-50"
+                          }`}
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <item.icon size={20} />
+                          <Link href={item.link} className="font-medium">
+                            {item.label}
+                          </Link>
+                        </Button>
+                      );
+                    })}
                   </div>
 
                   {/* Account Info */}

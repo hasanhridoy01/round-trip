@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useSearch } from "@/context/SearchContext";
 
-
 const LaunchComponent = () => {
   const router = useRouter();
   const { setResults } = useSearch();
@@ -59,7 +58,6 @@ const LaunchComponent = () => {
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
-
         toast.success(`Search successful for ${trip} trips`);
 
         // Clear form
@@ -71,7 +69,7 @@ const LaunchComponent = () => {
         // ✅ Push to route with query
         setResults(response.data.data);
         router.push(
-          `/tickets/booking/search?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
+          `/launch?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
         );
       } else {
         toast.error("No trips found");

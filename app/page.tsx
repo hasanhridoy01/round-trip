@@ -16,13 +16,11 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Hero from "@/components/Hero";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Hero Section */}
-      <Hero />
+      
 
       {/* Welcome Section */}
       {/* <section className="bg-gradient-to-r from-green-500 to-emerald-600 py-12">

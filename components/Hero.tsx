@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Bus, Ship, Briefcase, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
