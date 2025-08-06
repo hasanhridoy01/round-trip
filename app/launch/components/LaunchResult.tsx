@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { set } from "date-fns";
+import { useBookingContext } from "@/context/BookingContext";
 
 function getIcon(type?: string) {
   switch (type) {
@@ -104,6 +105,7 @@ interface TripData {
 
 const LaunchResult = () => {
   const searchParams = useSearchParams();
+  const { setBookingData } = useBookingContext();
   const [result, setResult] = useState<LaunchData[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<TripData | null>(null);
@@ -145,10 +147,45 @@ const LaunchResult = () => {
     });
   };
 
+  function getOrdinalSuffix(num: number) {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return "st";
+    if (j === 2 && k !== 12) return "nd";
+    if (j === 3 && k !== 13) return "rd";
+    return "th";
+  }
+
   const handleBookClick = () => {
-    if (selectedCabins.length > 0) {
-      console.log("Selected Cabins Data:", selectedCabins);
-      toast.success(`${selectedCabins.length} cabins selected for booking`);
+    if (selectedCabins.length > 0 && openTripId && tripData?.data) {
+      const floorNumber = selectedCabins[0]?.cabin_floor || 2;
+      const floorName =
+        tripData.data.floors?.find((f) => f.value === floorNumber)?.label ||
+        `${floorNumber}${getOrdinalSuffix(floorNumber)} Floor`;
+
+      // Find the current trip from the results
+      const currentTrip = result?.find((trip) => trip.trip_id === openTripId);
+      const tripType = currentTrip?.service_type || "unknown";
+
+      const bookingDetails = {
+        tripId: openTripId,
+        tripType: tripType,
+        floor: floorName,
+        selectedCabins: selectedCabins.map((cabin) => ({
+          ...cabin,
+          floor: floorName,
+        })),
+        vehicleName: tripData.data.vehicle_name,
+        routeName: tripData.data.route_name,
+      };
+
+      console.log("Booking Details:", bookingDetails);
+
+      // Set the booking data in context
+      // setBookingData(bookingDetails);  
+      toast.success(
+        `Booking ${selectedCabins.length} cabins for ${tripType} on ${floorName}`
+      );
     }
   };
 

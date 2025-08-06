@@ -30,8 +30,10 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="text-lg font-bold text-blue-600">
-            Travel<span className="text-purple-600">Hub</span>
+          <div className="text-lg font-bold text-blue-600 cursor-pointer">
+            <Link href={"/"}>
+              Travel<span className="text-purple-600">Hub</span>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -66,7 +68,9 @@ const Header = () => {
                 <SheetHeader>
                   <SheetTitle className="text-left">
                     <div className="text-xl font-bold text-blue-600">
-                      Travel<span className="text-purple-600">Hub</span>
+                      <Link href={"/"}>
+                        Travel<span className="text-purple-600">Hub</span>
+                      </Link>
                     </div>
                   </SheetTitle>
                 </SheetHeader>

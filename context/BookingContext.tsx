@@ -1,67 +1,65 @@
+"use client";
+
 import React, { createContext, useContext, ReactNode, useState } from "react";
 
 // Define types for different booking types
-type BookingType = "launch" | "bus" | "hotel" | "boat";
+type BookingType = "launch" | "bus" | "hotel" | "boat" | "train";
 
-interface BaseBookingData {
+interface SelectedCabin {
   booking_id: number | null;
-  merchant_id: number;
-  item_id: number;
-  status: number;
-  fare: number;
-  service_charge: number;
-  trip_date: string;
-  description: string;
-  nid_check: number;
-}
-
-interface LaunchBookingData extends BaseBookingData {
-  type: "launch";
   cabin_class: string;
   cabin_floor: number;
   cabin_id: number;
-  cabin_is_ac: number;
   cabin_no: string;
-  cabin_position: number;
-  cabin_row: number;
   cabin_type: string;
-  cabin_type_id: number;
   capacity: number;
+  description: string;
+  fare: number;
+  item_id: number;
+  merchant_id: number;
+  nid_check: number;
   ownership: string;
   route_id: number;
+  status: number;
+  trip_date: string;
   trip_id: number;
   vehicle_id: number;
   vehicle_name: string;
+  [key: string]: any; 
+}
+
+interface BaseBookingData {
+  tripId: number;
+  tripType: BookingType;
+  floor: string;
+  selectedCabins: SelectedCabin[];
+  vehicleName: string;
+  routeName: string;
+}
+
+interface LaunchBookingData extends BaseBookingData {
+  tripType: "launch";
+  // Launch-specific properties can be added here
 }
 
 interface BusBookingData extends BaseBookingData {
-  type: "bus";
-  seat_number: string;
-  bus_type: string;
-  departure_time: string;
-  arrival_time: string;
-  route_name: string;
-  coach_number: string;
+  tripType: "bus";
+  seatNumbers: string[];
+  busType: string;
+  departureTime: string;
 }
 
-interface HotelBookingData extends BaseBookingData {
-  type: "hotel";
-  room_number: string;
-  room_type: string;
-  check_in: string;
-  check_out: string;
-  hotel_name: string;
-  amenities: string[];
+interface HotelBookingData {
+  tripType: "hotel";
+  roomNumber: string;
+  checkInDate: string;
+  checkOutDate: string;
+  hotelName: string;
 }
 
 interface BoatBookingData extends BaseBookingData {
-  type: "boat";
-  deck_number: number;
-  cabin_number: string;
-  departure_time: string;
-  arrival_time: string;
-  route_name: string;
-  vessel_name: string;
+  tripType: "boat";
+  deckNumber: number;
 }
 
 type BookingData =
@@ -72,14 +70,12 @@ type BookingData =
 
 interface BookingContextType {
   bookingData: BookingData | null;
-  bookingType: BookingType | null;
-  setBookingData: <T extends BookingData>(type: BookingType, data: T) => void;
+  setBookingData: (data: BookingData) => void;
   clearBookingData: () => void;
 }
 
 const BookingContext = createContext<BookingContextType>({
   bookingData: null,
-  bookingType: null,
   setBookingData: () => {},
   clearBookingData: () => {},
 });
@@ -87,28 +83,21 @@ const BookingContext = createContext<BookingContextType>({
 export const BookingProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [bookingData, setBookingData] = useState<BookingData | null>(null);
-  const [bookingType, setBookingType] = useState<BookingType | null>(null);
+  const [bookingData, setBookingDataState] = useState<BookingData | null>(null);
 
-  const handleSetBookingData = <T extends BookingData>(
-    type: BookingType,
-    data: T
-  ) => {
-    setBookingType(type);
-    setBookingData(data);
+  const setBookingData = (data: BookingData) => {
+    setBookingDataState(data);
   };
 
   const clearBookingData = () => {
-    setBookingData(null);
-    setBookingType(null);
+    setBookingDataState(null);
   };
 
   return (
     <BookingContext.Provider
       value={{
         bookingData,
-        bookingType,
-        setBookingData: handleSetBookingData,
+        setBookingData,
         clearBookingData,
       }}
     >
