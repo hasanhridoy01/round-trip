@@ -23,7 +23,6 @@ const LaunchComponent = () => {
   const [journeyDate, setJourneyDate] = React.useState("");
   const [returnDate, setReturnDate] = React.useState("");
   const [trip, setTrip] = React.useState("launch");
-  const [loading, setLoading] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value as "oneWay" | "roundTrip";
@@ -37,49 +36,10 @@ const LaunchComponent = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      const params = new URLSearchParams({
-        trip_date: journeyDate,
-        trip_from: fromLocation,
-        trip_to: toLocation,
-        type: trip,
-      });
-
-      if (tripType === "roundTrip" && returnDate) {
-        params.append("return_trip_date", returnDate);
-      }
-
-      const response = await axios.get(
-        `${
-          process.env.NEXT_PUBLIC_API_BASE_URL
-        }/api/v2/search?${params.toString()}`
-      );
-
-      if (response.data.success && Array.isArray(response.data.data)) {
-        toast.success(`Search successful for ${trip} trips`);
-
-        // Clear form
-        setFromLocation("");
-        setToLocation("");
-        setJourneyDate("");
-        setReturnDate("");
-
-        // ✅ Push to route with query
-        setResults(response.data.data);
-        router.push(
-          `/launchBooking/launch?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
-        );
-      } else {
-        toast.error("No trips found");
-      }
-    } catch (error) {
-      console.error("Error searching trips:", error);
-      toast.error("Search failed");
-    }
-
-    setLoading(false);
+    router.push(
+      `/launch?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
+    );
   };
 
   return (
@@ -195,17 +155,13 @@ const LaunchComponent = () => {
             {/* Search Button */}
             <div
               className={`pt-3 md:pt-0 ${
-                tripType === "roundTrip"
-                  ? "md:col-span-2 mt-2"
-                  : "md:col-span-2"
-              } col-span-1 flex justify-center transation-all duration-300 ease-in-out`}
+                tripType === "roundTrip" ? "mt-2" : ""
+              } md:col-span-2 col-span-1 flex justify-center transition-all duration-300 ease-in-out`}
             >
               <Button
                 disabled={!fromLocation || !toLocation || !journeyDate}
                 type="submit"
-                className={`${
-                  tripType === "roundTrip" ? "h-14" : "h-14"
-                } w-full bg-primary hover:bg-primary/80 text-white text-lg font-medium rounded-md`}
+                className="h-14 w-full bg-primary hover:bg-primary/80 text-white text-lg font-medium rounded-md"
               >
                 SEARCH
               </Button>

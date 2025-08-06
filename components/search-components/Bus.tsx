@@ -37,49 +37,10 @@ const BusComponent = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      const params = new URLSearchParams({
-        trip_date: journeyDate,
-        trip_from: fromLocation,
-        trip_to: toLocation,
-        type: trip,
-      });
-
-      if (tripType === "roundTrip" && returnDate) {
-        params.append("return_trip_date", returnDate);
-      }
-
-      const response = await axios.get(
-        `${
-          process.env.NEXT_PUBLIC_API_BASE_URL
-        }/api/v2/search?${params.toString()}`
-      );
-
-      if (response.data.success && Array.isArray(response.data.data)) {
-        toast.success(`Search successful for ${trip} trips`);
-
-        // Clear form
-        setFromLocation("");
-        setToLocation("");
-        setJourneyDate("");
-        setReturnDate("");
-
-        // ✅ Push to route with query
-        setResults(response.data.data);
-        router.push(
-          `/busBooking/bus?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
-        );
-      } else {
-        toast.error("No trips found");
-      }
-    } catch (error) {
-      console.error("Error searching trips:", error);
-      toast.error("Search failed");
-    }
-
-    setLoading(false);
+    router.push(
+      `/bus?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
+    );
   };
 
   return (
