@@ -62,12 +62,25 @@ interface LaunchData {
   return_trip_date?: string;
   trip_from?: string;
   trip_to?: string;
-  trip_id?: string;
+  trip_id?: string | number;
   service_type?: string;
   route_name?: string;
   starting_point?: string;
   ending_point?: string;
   schedule_date?: string;
+}
+
+interface TripData {
+  data?: {
+    id?: number;
+    trip_id?: number;
+    vehicle_name?: string;
+    route_name?: string;
+    schedule_date?: string;
+    cabin_rows?: number;
+    floors?: Array<{ label: string; value: number }>;
+    cabins: Record<string, Record<number, Cabin[]>>;
+  };
 }
 
 interface Cabin {
@@ -84,23 +97,8 @@ interface Cabin {
   cabin_position?: number;
   description?: string;
   cabin_class?: string;
-}
-
-interface TripData {
-  data?: {
-    id?: number;
-    trip_id?: number;
-    vehicle_name?: string;
-    route_name?: string;
-    schedule_date?: string;
-    floors?: Array<{ label: string; value: number }>;
-    cabins?: {
-      first_floor?: Cabin[] | { [key: string]: Cabin[] };
-      second_floor?: { [key: string]: Cabin[] };
-      third_floor?: Cabin[] | { [key: string]: Cabin[] };
-      fourth_floor?: Cabin[] | { [key: string]: Cabin[] };
-    };
-  };
+  ac_type?: string;
+  cabin_is_ac?: boolean;
 }
 
 const LaunchResult = () => {
@@ -112,6 +110,7 @@ const LaunchResult = () => {
   const [tripDataLoading, setTripDataLoading] = useState(false);
   const [openTripId, setOpenTripId] = useState<string | undefined>();
   const [selectedCabins, setSelectedCabins] = useState<Cabin[]>([]);
+  const [activeFloor, setActiveFloor] = useState(1);
 
   const handleTripSelect = async (tripId: string) => {
     setTripDataLoading(true);
@@ -182,7 +181,7 @@ const LaunchResult = () => {
       console.log("Booking Details:", bookingDetails);
 
       // Set the booking data in context
-      // setBookingData(bookingDetails);  
+      // setBookingData(bookingDetails);
       toast.success(
         `Booking ${selectedCabins.length} cabins for ${tripType} on ${floorName}`
       );
@@ -258,7 +257,7 @@ const LaunchResult = () => {
         {result.map((item) => (
           <AccordionItem
             key={item.trip_id}
-            value={item.trip_id || ""}
+            value={item.trip_id?.toString() || ""}
             className="border rounded-lg"
           >
             <AccordionTrigger className="px-4 hover:no-underline border-b">
@@ -273,13 +272,14 @@ const LaunchResult = () => {
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="px-4 py-4">
+            <AccordionContent className="px-3 py-4">
               {tripDataLoading ? (
                 <div className="flex justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : tripData?.data ? (
                 <div className="space-y-6">
+                  {/* Header */}
                   <div className="text-center">
                     <h3 className="text-lg font-semibold">
                       {tripData.data.vehicle_name}
@@ -287,105 +287,6 @@ const LaunchResult = () => {
                     <p className="text-sm text-muted-foreground">
                       {tripData.data.route_name} • {tripData.data.schedule_date}
                     </p>
-                  </div>
-
-                  {/* Floor Content */}
-                  {tripData.data.cabins?.second_floor ? (
-                    <>
-                      <div className="border rounded-lg p-4 bg-blue-50">
-                        <h4 className="font-medium mb-3 text-center">
-                          2nd Floor Cabin Layout
-                        </h4>
-
-                        <div className="space-y-4">
-                          {Object.entries(
-                            tripData.data.cabins.second_floor
-                          ).map(([row, cabins]) => (
-                            <div
-                              key={row}
-                              className="flex justify-center gap-2"
-                            >
-                              {(cabins as Cabin[]).map((cabin, index) => (
-                                <div
-                                  key={index}
-                                  onClick={() => handleCabinClick(cabin)}
-                                  className={`
-                                      w-24 h-16 rounded-md flex flex-col items-center justify-center border
-                                      ${
-                                        cabin.cabin_type === "empty"
-                                          ? "bg-gray-100 border-dashed"
-                                          : selectedCabins.some(
-                                              (c) => c.item_id === cabin.item_id
-                                            )
-                                          ? "bg-blue-100 border-blue-400 ring-2 ring-blue-300"
-                                          : cabin.status === 1
-                                          ? "bg-green-100 border-green-300 hover:bg-green-200 cursor-pointer"
-                                          : "bg-red-100 border-red-300 opacity-70"
-                                      }
-                                      transition-colors relative
-                                    `}
-                                  title={
-                                    cabin.cabin_type === "empty"
-                                      ? "Empty space"
-                                      : cabin.description
-                                  }
-                                >
-                                  {cabin.cabin_type !== "empty" && (
-                                    <>
-                                      <span className="font-medium text-sm">
-                                        {cabin.cabin_no}
-                                      </span>
-                                      <span className="text-xs text-muted-foreground">
-                                        ৳{cabin.fare}
-                                      </span>
-                                      {cabin.status === 1 && (
-                                        <span className="absolute top-1 right-1 text-xs bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
-                                          {cabin.capacity}
-                                        </span>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Book Button */}
-                      {selectedCabins.length > 0 && (
-                        <div className="flex justify-center">
-                          <button
-                            onClick={handleBookClick}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            disabled={selectedCabins.length === 0}
-                          >
-                            Book {selectedCabins.length} Cabin
-                            {selectedCabins.length !== 1 ? "s" : ""}
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="border rounded-lg p-8 text-center bg-gray-50">
-                      <p className="text-gray-500">
-                        No cabin data available for this floor
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Information about other floors */}
-                  <div className="space-y-2">
-                    {tripData.data.floors
-                      ?.filter((f) => f.value !== 2)
-                      .map((floor) => (
-                        <div
-                          key={floor.value}
-                          className="text-sm text-center text-gray-500"
-                        >
-                          {floor.label} has no cabin available
-                        </div>
-                      ))}
                   </div>
 
                   {/* Legend */}
@@ -406,7 +307,176 @@ const LaunchResult = () => {
                       <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded-sm"></div>
                       <span>Selected</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[8px] bg-white text-blue-600 px-1 rounded">
+                        S-AC
+                      </span>
+                      <span>Single AC</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[8px] bg-white text-blue-600 px-1 rounded">
+                        D-AC
+                      </span>
+                      <span>Double AC</span>
+                    </div>
                   </div>
+
+                  {/* Floor Render */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {tripData?.data?.floors?.map((floor) => {
+                      const floorKey =
+                        floor.value === 1
+                          ? "first_floor"
+                          : floor.value === 2
+                          ? "second_floor"
+                          : floor.value === 3
+                          ? "third_floor"
+                          : `floor_${floor.value}`;
+
+                      const floorCabins = tripData?.data?.cabins?.[floorKey] as
+                        | Record<number, Cabin[]>
+                        | undefined;
+                      const cabinRows = tripData?.data?.cabin_rows ?? 0;
+
+                      return (
+                        <div
+                          key={floor.value}
+                          className="border rounded-lg p-3 bg-blue-50 border-blue-200"
+                        >
+                          <h4 className="font-medium mb-3 text-center">
+                            {floor.label} Cabin Layout
+                          </h4>
+
+                          {floorCabins &&
+                          Object.keys(floorCabins).length > 0 ? (
+                            <div className="grid grid-cols-1 gap-2">
+                              {Array.from(
+                                { length: cabinRows },
+                                (_, rowIndex) => {
+                                  const rowNum = rowIndex + 1;
+                                  const rowCabins = floorCabins[rowNum] || [];
+
+                                  const cabinPairs = [
+                                    [1, 2],
+                                    [3, 4],
+                                  ];
+
+                                  return (
+                                    <div
+                                      key={rowNum}
+                                      className="grid grid-cols-2 gap-8"
+                                    >
+                                      {cabinPairs.map((pair, pairIndex) => (
+                                        <div
+                                          key={pairIndex}
+                                          className="grid grid-cols-2 gap-2 justify-items-center"
+                                        >
+                                          {pair.map((pos) => {
+                                            const cabin = rowCabins.find(
+                                              (c) => c.cabin_position === pos
+                                            ) || {
+                                              cabin_type: "empty",
+                                            };
+
+                                            return (
+                                              <button
+                                                key={pos}
+                                                type="button"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  if (
+                                                    cabin.cabin_type !== "empty"
+                                                  ) {
+                                                    handleCabinClick(cabin);
+                                                  }
+                                                }}
+                                                disabled={
+                                                  cabin.cabin_type ===
+                                                    "empty" ||
+                                                  cabin.status !== 1
+                                                }
+                                                className={`
+                    w-full h-16 flex flex-col items-center justify-center text-center 
+                    border rounded-md text-xs relative transition-colors
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                    ${
+                      cabin.cabin_type === "empty"
+                        ? "bg-gray-100 border-dashed cursor-default"
+                        : selectedCabins.some(
+                            (c) => c.item_id === cabin.item_id
+                          )
+                        ? "bg-blue-100 border-blue-400 ring-2 ring-blue-300"
+                        : cabin.status === 1
+                        ? "bg-green-100 border-green-300 hover:bg-green-200 cursor-pointer"
+                        : "bg-red-100 border-red-300 opacity-70 cursor-not-allowed"
+                    }
+                  `}
+                                                aria-label={
+                                                  cabin.cabin_type === "empty"
+                                                    ? "Empty space"
+                                                    : `Cabin ${
+                                                        cabin.cabin_no
+                                                      } - ${
+                                                        cabin.description || ""
+                                                      }`
+                                                }
+                                              >
+                                                {cabin.cabin_type !==
+                                                  "empty" && (
+                                                  <>
+                                                    <span className="font-medium text-[10px]">
+                                                      {cabin.cabin_no}
+                                                    </span>
+                                                    <span className="text-[10px] text-muted-foreground">
+                                                      ৳{cabin.fare}
+                                                    </span>
+                                                    {cabin.cabin_is_ac && (
+                                                      <span className="absolute top-1 left-1 text-[8px] bg-white text-blue-600 px-1 rounded">
+                                                        {cabin.capacity === 1
+                                                          ? "S-AC"
+                                                          : "D-AC"}
+                                                      </span>
+                                                    )}
+                                                    {cabin.status === 1 && (
+                                                      <span className="absolute top-1 right-1 text-[10px] bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
+                                                        {cabin.capacity}
+                                                      </span>
+                                                    )}
+                                                  </>
+                                                )}
+                                              </button>
+                                            );
+                                          })}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+                                }
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-center text-sm text-gray-500">
+                              No cabin data available
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Book Button */}
+                  {selectedCabins.length > 0 && (
+                    <div className="flex justify-center">
+                      <button
+                        onClick={handleBookClick}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        disabled={selectedCabins.length === 0}
+                      >
+                        Book {selectedCabins.length} Cabin
+                        {selectedCabins.length !== 1 ? "s" : ""}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-4 text-muted-foreground">
