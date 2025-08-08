@@ -10,9 +10,6 @@ interface PageProps {
   };
 }
 
-// Solution 1: Force dynamic rendering (recommended for search pages)
-export const dynamic = "force-dynamic";
-
 // Solution 2: Alternative - disable static generation
 // export const revalidate = 0;
 

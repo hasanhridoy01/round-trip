@@ -10,9 +10,6 @@ interface PageProps {
   };
 }
 
-// This tells Next.js to render this page on-demand at request time
-export const dynamic = "force-dynamic";
-
 export default function Page({ searchParams }: PageProps) {
   const hasSearchParams =
     searchParams.trip_from && searchParams.trip_to && searchParams.trip_date;
