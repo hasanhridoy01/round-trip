@@ -220,6 +220,7 @@ const LaunchResult = () => {
         })),
         vehicleName: tripData.data.vehicle_name,
         routeName: tripData.data.route_name,
+        deckNumber: floorNumber,
       };
 
       console.log("Booking Details:", bookingDetails);
