@@ -81,12 +81,10 @@ const CheckOutButton = () => {
     );
 
     if (updatedCabins.length === 0) {
-      // If no cabins left, clear everything
       setBookings(null);
       setCheckoutCount(0);
       setBookingData(null);
     } else {
-      // Update the bookings with the remaining cabins
       const updatedBooking = {
         ...bookings,
         selectedCabins: updatedCabins,
