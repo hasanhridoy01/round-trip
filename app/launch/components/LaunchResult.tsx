@@ -136,6 +136,7 @@ interface bookingDetails {
   selectedCabins: SelectedCabin[];
   vehicleName: string;
   routeName: string;
+  deckNumber: number;
 }
 
 interface BookingContextType {
@@ -148,7 +149,6 @@ const LaunchResult = () => {
   const searchParams = useSearchParams();
   const { setBookingData } = useBookingContext();
   const [result, setResult] = useState<LaunchData[] | null>(null);
-  console.log(result);
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<TripData | null>(null);
   const [tripDataLoading, setTripDataLoading] = useState(false);
