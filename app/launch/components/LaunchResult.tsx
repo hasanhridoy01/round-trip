@@ -131,7 +131,7 @@ interface SelectedCabin {
 
 interface bookingDetails {
   tripId: number;
-  tripType: string;
+  tripType: "boat" | "bus" | "train" | "launch";
   floor: string;
   selectedCabins: SelectedCabin[];
   vehicleName: string;
