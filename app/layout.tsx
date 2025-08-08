@@ -27,7 +27,6 @@ export default function RootLayout({
         <SearchProvider>
           <BookingProvider>
             <Header />
-            {/* Hero Section */}
             <Hero />
             <main className="flex-grow">{children}</main>
             <CheckOutButton />

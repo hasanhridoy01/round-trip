@@ -18,7 +18,7 @@ export default function Page({ searchParams }: PageProps) {
     searchParams.trip_from && searchParams.trip_to && searchParams.trip_date;
 
   return (
-    <div className="p-6 max-w-7xl md:pt-44 md:pb-24 mx-auto">
+    <div className="md:p-6 p-0 max-w-7xl md:pt-44 pt-96 md:pb-24 pb-24 mx-auto">
       {hasSearchParams ? (
         <LaunchResult />
       ) : (

@@ -1,8 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import {
+  ShoppingCart,
+  Trash2,
+  ChevronRight,
+  Ticket,
+  MapPin,
+  Layers,
+  Route,
+  Calendar,
+} from "lucide-react";
 import {
   Drawer,
   DrawerTrigger,
@@ -13,121 +22,117 @@ import {
   DrawerFooter,
   DrawerClose,
 } from "@/components/ui/drawer";
+import { useBookingContext } from "@/context/BookingContext";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
-interface BookingDetail {
-  label: string;
-  value: string;
+interface SelectedCabin {
+  booking_id: number | null;
+  cabin_class: string;
+  cabin_floor: number;
+  cabin_id: number;
+  cabin_is_ac: number;
+  cabin_no: string;
+  cabin_position: number;
+  cabin_row: number;
+  cabin_type: string;
+  cabin_type_id: number;
+  capacity: number;
+  description: string;
+  fare: number;
+  floor: string;
+  item_id: number;
+  merchant_id: number;
+  nid_check: number;
+  ownership: string;
+  route_id: number;
+  service_charge: number;
+  status: number;
+  trip_date: string;
+  trip_id: number;
+  vehicle_id: number;
+  vehicle_name: string;
 }
 
 interface Booking {
-  id: number;
-  type: string;
-  details: BookingDetail[];
+  tripId: number;
+  tripType: string;
+  floor: string;
+  selectedCabins: SelectedCabin[];
+  vehicleName: string;
+  routeName: string;
 }
 
-const bookingData: Booking[] = [
-  {
-    id: 1,
-    type: "🏨 Hotel Booking",
-    details: [
-      { label: "Hotel", value: "Grand Palace" },
-      { label: "Check-in", value: "Aug 10, 2025" },
-      { label: "Nights", value: "3" },
-    ],
-  },
-  {
-    id: 2,
-    type: "✈️ Flight Booking",
-    details: [
-      { label: "From", value: "Dhaka" },
-      { label: "To", value: "Dubai" },
-      { label: "Date", value: "Aug 10, 2025" },
-    ],
-  },
-  {
-    id: 3,
-    type: "🍽️ Lunch Booking",
-    details: [
-      { label: "Restaurant", value: "Spice Garden" },
-      { label: "Time", value: "1:00 PM" },
-      { label: "Date", value: "Aug 11, 2025" },
-    ],
-  },
-  {
-    id: 4,
-    type: "🏨 Hotel Booking",
-    details: [
-      { label: "Hotel", value: "Royal Suites" },
-      { label: "Check-in", value: "Aug 12, 2025" },
-      { label: "Nights", value: "2" },
-    ],
-  },
-  {
-    id: 5,
-    type: "✈️ Flight Booking",
-    details: [
-      { label: "From", value: "Dubai" },
-      { label: "To", value: "Maldives" },
-      { label: "Date", value: "Aug 15, 2025" },
-    ],
-  },
-  {
-    id: 6,
-    type: "🚗 Car Rental",
-    details: [
-      { label: "Company", value: "Hertz" },
-      { label: "Type", value: "SUV" },
-      { label: "Days", value: "5" },
-    ],
-  },
-  {
-    id: 7,
-    type: "🏨 Hotel Booking",
-    details: [
-      { label: "Hotel", value: "Beach Resort" },
-      { label: "Check-in", value: "Aug 15, 2025" },
-      { label: "Nights", value: "7" },
-    ],
-  },
-  {
-    id: 8,
-    type: "✈️ Flight Booking",
-    details: [
-      { label: "From", value: "Maldives" },
-      { label: "To", value: "Dhaka" },
-      { label: "Date", value: "Aug 22, 2025" },
-    ],
-  },
-  {
-    id: 9,
-    type: "🍽️ Dinner Booking",
-    details: [
-      { label: "Restaurant", value: "Ocean View" },
-      { label: "Time", value: "8:00 PM" },
-      { label: "Date", value: "Aug 18, 2025" },
-    ],
-  },
-  {
-    id: 10,
-    type: "🚤 Boat Tour",
-    details: [
-      { label: "Tour", value: "Sunset Cruise" },
-      { label: "Duration", value: "2 hours" },
-      { label: "Date", value: "Aug 19, 2025" },
-    ],
-  },
-];
-
 const CheckOutButton = () => {
+  const { bookingData, setBookingData } = useBookingContext();
   const [checkoutCount, setCheckoutCount] = useState<number>(0);
-  const [bookings, setBookings] = useState<Booking[]>(bookingData);
+  const [bookings, setBookings] = useState<Booking | null>(null);
 
   const handleCheckout = () => {
     setCheckoutCount((prev) => prev + 1);
   };
 
-  const handleDelete = (id: number) => {
-    setBookings(bookings.filter((booking) => booking.id !== id));
+  const handleDeleteCabin = (cabinId: number) => {
+    if (!bookings) return;
+
+    // Filter out the cabin to be deleted
+    const updatedCabins = bookings.selectedCabins.filter(
+      (cabin) => cabin.cabin_id !== cabinId
+    );
+
+    if (updatedCabins.length === 0) {
+      // If no cabins left, clear everything
+      setBookings(null);
+      setCheckoutCount(0);
+      setBookingData(null);
+    } else {
+      // Update the bookings with the remaining cabins
+      const updatedBooking = {
+        ...bookings,
+        selectedCabins: updatedCabins,
+      };
+      setBookings(updatedBooking);
+      setBookingData(updatedBooking);
+      setCheckoutCount(updatedCabins.length);
+    }
+  };
+
+  const handleDeleteAll = () => {
+    // Clear all bookings
+    setBookings(null);
+    setCheckoutCount(0);
+    setBookingData(null);
+  };
+
+  useEffect(() => {
+    if (bookingData) {
+      setBookings(bookingData);
+      setCheckoutCount(bookingData.selectedCabins.length);
+    }
+  }, [bookingData]);
+
+  const calculateTotal = () => {
+    if (!bookings) return 0;
+    return bookings.selectedCabins.reduce((sum, cabin) => sum + cabin.fare, 0);
+  };
+
+  // Convert booking data to display format
+  const getBookingDetails = (booking: Booking) => {
+    return [
+      { label: "Trip ID", value: booking.tripId.toString() },
+      { label: "Trip Type", value: booking.tripType },
+      { label: "Floor", value: booking.floor },
+      { label: "Vehicle", value: booking.vehicleName },
+      { label: "Route", value: booking.routeName },
+      { label: "Cabins", value: booking.selectedCabins.length.toString() },
+      {
+        label: "Total Fare",
+        value: `$${booking.selectedCabins.reduce(
+          (sum, cabin) => sum + cabin.fare,
+          0
+        )}`,
+      },
+    ];
   };
 
   return (
@@ -136,11 +141,11 @@ const CheckOutButton = () => {
         <DrawerTrigger asChild>
           <Button
             onClick={handleCheckout}
-            className="relative h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md hover:from-blue-700 hover:to-purple-700 transition-all"
+            className="relative h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
           >
             <ShoppingCart size={24} />
             {checkoutCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+              <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white animate-pulse">
                 {checkoutCount}
               </span>
             )}
@@ -150,53 +155,141 @@ const CheckOutButton = () => {
         <DrawerContent className="p-0">
           <div className="sticky top-0 z-10 bg-white border-b px-6 py-4">
             <DrawerHeader className="p-0">
-              <DrawerTitle>Checkout Summary</DrawerTitle>
-              <DrawerDescription>
-                You have checked out {checkoutCount}{" "}
-                {checkoutCount === 1 ? "time" : "times"}.
+              <DrawerTitle className="text-xl font-bold flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5" />
+                Booking Summary
+              </DrawerTitle>
+              <DrawerDescription className="text-sm mt-1">
+                {checkoutCount > 0 ? (
+                  <span className="text-green-600">
+                    You have {checkoutCount} item
+                    {checkoutCount !== 1 ? "s" : ""} in your cart
+                  </span>
+                ) : (
+                  "Your booking cart is empty"
+                )}
               </DrawerDescription>
             </DrawerHeader>
           </div>
 
-          <div className="overflow-y-auto min-h-[calc(100vh-205px)] px-6 py-4 flex flex-col">
-            {bookings.length > 0 ? (
-              <div className="space-y-4">
-                {bookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md cursor-pointer relative"
+          <div className="overflow-y-auto flex-1 px-6 py-4">
+            {bookings ? (
+              <div className="space-y-6">
+                <div className="border rounded-xl p-5 shadow-sm bg-white dark:bg-gray-900 relative transition-all hover:shadow-md">
+                  <button
+                    onClick={handleDeleteAll}
+                    className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-red-500 transition-colors"
                   >
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(booking.id);
-                      }}
-                      className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                    <h3 className="font-semibold text-base mb-2">
-                      {booking.type}
-                    </h3>
-                    {booking.details.map((detail, i) => (
-                      <p key={i}>
-                        <span className="font-medium">{detail.label}:</span>{" "}
-                        {detail.value}
+                    <Trash2 size={16} />
+                  </button>
+
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Badge variant="secondary" className="uppercase">
+                          {bookings.tripType}
+                        </Badge>
+                        <span>Booking #{bookings.tripId}</span>
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {bookings.selectedCabins.length} cabin
+                        {bookings.selectedCabins.length !== 1 ? "s" : ""}{" "}
+                        selected
                       </p>
+                    </div>
+                  </div>
+
+                  <Separator className="my-3" />
+
+                  <div className="grid gap-3">
+                    {getBookingDetails(bookings).map((detail, i) => (
+                      <div key={i} className="flex items-center gap-3 text-sm">
+                        <span className="text-gray-500 dark:text-gray-400">
+                          {detail.icon}
+                        </span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {detail.label}:
+                        </span>
+                        <span className="ml-auto font-medium">
+                          {detail.value}
+                        </span>
+                      </div>
                     ))}
                   </div>
-                ))}
+
+                  <Separator className="my-4" />
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Layers className="w-4 h-4" />
+                      Selected Cabins
+                    </h4>
+                    <ul className="space-y-2">
+                      {bookings.selectedCabins.map((cabin) => (
+                        <li
+                          key={cabin.cabin_id}
+                          className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                        >
+                          <div>
+                            <p className="font-medium">{cabin.cabin_no}</p>
+                            <p className="text-sm text-gray-500">
+                              {cabin.description}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="ml-2">
+                              ${cabin.fare}
+                            </Badge>
+                            <button
+                              onClick={() => handleDeleteCabin(cabin.cabin_id)}
+                              className="p-1 text-gray-500 hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">Subtotal</span>
+                    <span>${calculateTotal()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Service Fee</span>
+                    <span>$5.00</span>
+                  </div>
+                  <Separator className="my-3" />
+                  <div className="flex justify-between items-center font-bold text-lg">
+                    <span>Total</span>
+                    <span>${calculateTotal() + 5}</span>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <p className="text-center text-gray-500">No bookings found.</p>
+              <div className="flex flex-col items-center justify-center h-full py-12 text-center">
+                <ShoppingCart className="w-12 h-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+                  Your booking cart is empty
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-xs">
+                  Select cabins to start your booking process
+                </p>
               </div>
             )}
           </div>
 
           <div className="sticky bottom-0 z-10 bg-white border-t px-6 py-4">
             <DrawerFooter className="p-0 flex gap-2">
-              <Button className="w-full hover:bg-secondary">Submit</Button>
+              <Button
+                className="w-full hover:bg-secondary"
+                disabled={!bookings}
+              >
+                Submit
+              </Button>
               <DrawerClose className="w-full">
                 <Button
                   variant="outline"

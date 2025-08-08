@@ -2,9 +2,10 @@
 
 import React, { createContext, useContext, ReactNode, useState } from "react";
 
-// Define types for different booking types
+// Define booking types
 type BookingType = "launch" | "bus" | "hotel" | "boat" | "train";
 
+// Common selected cabin type
 interface SelectedCabin {
   booking_id: number | null;
   cabin_class: string;
@@ -25,9 +26,10 @@ interface SelectedCabin {
   trip_id: number;
   vehicle_id: number;
   vehicle_name: string;
-  [key: string]: any; 
+  [key: string]: any; // for extra properties if needed
 }
 
+// Base structure for most transport bookings
 interface BaseBookingData {
   tripId: number;
   tripType: BookingType;
@@ -37,9 +39,9 @@ interface BaseBookingData {
   routeName: string;
 }
 
+// Specific types for each trip type
 interface LaunchBookingData extends BaseBookingData {
   tripType: "launch";
-  // Launch-specific properties can be added here
 }
 
 interface BusBookingData extends BaseBookingData {
@@ -62,24 +64,28 @@ interface BoatBookingData extends BaseBookingData {
   deckNumber: number;
 }
 
+// Union type for all booking types
 type BookingData =
   | LaunchBookingData
   | BusBookingData
   | HotelBookingData
   | BoatBookingData;
 
+// Context interface
 interface BookingContextType {
   bookingData: BookingData | null;
   setBookingData: (data: BookingData) => void;
   clearBookingData: () => void;
 }
 
+// Create the context
 const BookingContext = createContext<BookingContextType>({
   bookingData: null,
   setBookingData: () => {},
   clearBookingData: () => {},
 });
 
+// Provider component
 export const BookingProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
@@ -106,4 +112,5 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+// Hook to use booking context
 export const useBookingContext = () => useContext(BookingContext);

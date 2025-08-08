@@ -101,14 +101,59 @@ interface Cabin {
   cabin_is_ac?: boolean;
 }
 
+interface SelectedCabin {
+  booking_id: number | null;
+  cabin_class: string;
+  cabin_floor: number;
+  cabin_id: number;
+  cabin_is_ac: number;
+  cabin_no: string;
+  cabin_position: number;
+  cabin_row: number;
+  cabin_type: string;
+  cabin_type_id: number;
+  capacity: number;
+  description: string;
+  fare: number;
+  floor: string;
+  item_id: number;
+  merchant_id: number;
+  nid_check: number;
+  ownership: string;
+  route_id: number;
+  service_charge: number;
+  status: number;
+  trip_date: string;
+  trip_id: number;
+  vehicle_id: number;
+  vehicle_name: string;
+}
+
+interface bookingDetails {
+  tripId: number;
+  tripType: string;
+  floor: string;
+  selectedCabins: SelectedCabin[];
+  vehicleName: string;
+  routeName: string;
+}
+
+interface BookingContextType {
+  bookingDetails: bookingDetails | null;
+  setBookingData: (data: bookingDetails) => void;
+  clearBookingData: () => void;
+}
+
 const LaunchResult = () => {
   const searchParams = useSearchParams();
   const { setBookingData } = useBookingContext();
   const [result, setResult] = useState<LaunchData[] | null>(null);
+  console.log(result);
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<TripData | null>(null);
   const [tripDataLoading, setTripDataLoading] = useState(false);
   const [openTripId, setOpenTripId] = useState<string | undefined>();
+  const [currentTrip, setCurrentTrip] = useState<string | undefined>();
   const [selectedCabins, setSelectedCabins] = useState<Cabin[]>([]);
   const [activeFloor, setActiveFloor] = useState(1);
 
@@ -162,13 +207,12 @@ const LaunchResult = () => {
         tripData.data.floors?.find((f) => f.value === floorNumber)?.label ||
         `${floorNumber}${getOrdinalSuffix(floorNumber)} Floor`;
 
-      // Find the current trip from the results
-      const currentTrip = result?.find((trip) => trip.trip_id === openTripId);
-      const tripType = currentTrip?.service_type || "unknown";
+      const currentTrip = result?.find((trip) => trip.service_type);
+      const currentTripType = currentTrip?.service_type || "unknown";
 
       const bookingDetails = {
         tripId: openTripId,
-        tripType: tripType,
+        tripType: currentTripType,
         floor: floorName,
         selectedCabins: selectedCabins.map((cabin) => ({
           ...cabin,
@@ -180,10 +224,9 @@ const LaunchResult = () => {
 
       console.log("Booking Details:", bookingDetails);
 
-      // Set the booking data in context
-      // setBookingData(bookingDetails);
+      setBookingData(bookingDetails);
       toast.success(
-        `Booking ${selectedCabins.length} cabins for ${tripType} on ${floorName}`
+        `Booking ${selectedCabins.length} cabins for ${currentTripType} on ${floorName}`
       );
     }
   };
@@ -237,7 +280,12 @@ const LaunchResult = () => {
     fetchLaunchData();
   }, [searchParams]);
 
-  if (loading) return <p>Loading search results...</p>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   if (!result || result.length === 0) return <p>No results found.</p>;
 
   return (
@@ -293,31 +341,31 @@ const LaunchResult = () => {
                   <div className="flex flex-wrap gap-4 justify-center text-sm">
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-green-100 border border-green-300 rounded-sm"></div>
-                      <span>Available</span>
+                      <span className="text-base">Available</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-red-100 border border-red-300 rounded-sm"></div>
-                      <span>Booked</span>
+                      <span className="text-base">Booked</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-gray-100 border border-dashed rounded-sm"></div>
-                      <span>Empty space</span>
+                      <span className="text-base">Empty space</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded-sm"></div>
-                      <span>Selected</span>
+                      <span className="text-base">Selected</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[8px] bg-white text-blue-600 px-1 rounded">
+                      <span className="text-[12px] bg-white text-blue-600 px-1 rounded">
                         S-AC
                       </span>
-                      <span>Single AC</span>
+                      <span className="text-base">Single AC</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[8px] bg-white text-blue-600 px-1 rounded">
+                      <span className="text-[12px] bg-white text-blue-600 px-1 rounded">
                         D-AC
                       </span>
-                      <span>Double AC</span>
+                      <span className="text-base">Double AC</span>
                     </div>
                   </div>
 
@@ -341,7 +389,7 @@ const LaunchResult = () => {
                       return (
                         <div
                           key={floor.value}
-                          className="border rounded-lg p-3 bg-blue-50 border-blue-200"
+                          className="rounded-tl-[200px] rounded-tr-[200px] p-4 bg-blue-50 pt-32 mt-5 border border-blue-300"
                         >
                           <h4 className="font-medium mb-3 text-center">
                             {floor.label} Cabin Layout
