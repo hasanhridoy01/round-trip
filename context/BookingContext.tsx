@@ -2,9 +2,6 @@
 
 import React, { createContext, useContext, ReactNode, useState } from "react";
 
-// Define booking types
-type BookingType = "launch" | "bus" | "hotel" | "boat" | "train";
-
 // Common selected cabin type
 interface SelectedCabin {
   booking_id: number | null;
@@ -31,8 +28,8 @@ interface SelectedCabin {
 
 // Base structure for most transport bookings
 interface BaseBookingData {
-  tripId: number;
-  tripType: BookingType;
+  tripId: string;
+  tripType: string;
   floor: string;
   selectedCabins: SelectedCabin[];
   vehicleName: string;
@@ -42,6 +39,7 @@ interface BaseBookingData {
 // Specific types for each trip type
 interface LaunchBookingData extends BaseBookingData {
   tripType: "launch";
+  deckNumber: number;
 }
 
 interface BusBookingData extends BaseBookingData {

@@ -130,19 +130,13 @@ interface SelectedCabin {
 }
 
 interface bookingDetails {
-  tripId: number;
-  tripType: "launch";
+  tripId: string;
+  tripType: string;
   floor: string;
   selectedCabins: SelectedCabin[];
   vehicleName: string;
   routeName: string;
   deckNumber: number;
-}
-
-interface BookingContextType {
-  bookingDetails: bookingDetails | null;
-  setBookingData: (data: bookingDetails) => void;
-  clearBookingData: () => void;
 }
 
 const LaunchResult = () => {
@@ -209,10 +203,11 @@ const LaunchResult = () => {
 
       const currentTrip = result?.find((trip) => trip.service_type);
       const currentTripType = currentTrip?.service_type || "unknown";
+      console.log(currentTripType);
 
       const bookingDetails = {
         tripId: openTripId,
-        tripType: currentTripType,
+        tripType: currentTripType as "launch",
         floor: floorName,
         selectedCabins: selectedCabins.map((cabin) => ({
           ...cabin,

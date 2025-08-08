@@ -55,22 +55,19 @@ interface SelectedCabin {
 }
 
 interface Booking {
-  tripId: number;
+  tripId: string;
   tripType: string;
   floor: string;
   selectedCabins: SelectedCabin[];
   vehicleName: string;
   routeName: string;
+  deckNumber: number;
 }
 
 const CheckOutButton = () => {
   const { bookingData, setBookingData } = useBookingContext();
   const [checkoutCount, setCheckoutCount] = useState<number>(0);
   const [bookings, setBookings] = useState<Booking | null>(null);
-
-  const handleCheckout = () => {
-    setCheckoutCount((prev) => prev + 1);
-  };
 
   const handleDeleteCabin = (cabinId: number) => {
     if (!bookings) return;
@@ -138,7 +135,6 @@ const CheckOutButton = () => {
       <Drawer>
         <DrawerTrigger asChild>
           <Button
-            onClick={handleCheckout}
             className="relative h-16 w-16 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
           >
             <ShoppingCart size={24} />
