@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import { BookingProvider } from "@/context/BookingContext";
 import { SearchProvider } from "@/context/SearchContext";
+import HeroWrapper from "@/components/HeroWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +28,7 @@ export default function RootLayout({
         <SearchProvider>
           <BookingProvider>
             <Header />
-            <Hero />
+            <HeroWrapper />
             <main className="flex-grow">{children}</main>
             <CheckOutButton />
             <Toaster position="top-right" />

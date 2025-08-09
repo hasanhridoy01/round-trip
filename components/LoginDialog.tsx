@@ -43,7 +43,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-const LoginDialog = () => {
+const LoginDialog = (isOpen: boolean) => {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [numberFieldDisabled, setNumberFieldDisabled] = useState(false);
@@ -149,17 +149,19 @@ const LoginDialog = () => {
       params.append("mobile", phoneNumber);
       params.append("password", password);
 
-      const { data } = await axios.post("/api/v2/auth/check", params, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/login`,
+        params,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
-      const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem("authToken", data.token);
+      localStorage.setItem("token", data.token);
 
       toast.success("Login successful");
-      router.push("/");
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error("Login failed", {
