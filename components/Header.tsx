@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Link from "next/link";
-import { Bus, Ship, Phone, Menu, Briefcase, Building2 } from "lucide-react";
+import { Bus, Ship, Phone, Menu, Briefcase, Building2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,17 +13,26 @@ import {
 } from "@/components/ui/sheet";
 import LoginDialog from "./LoginDialog";
 import { usePathname } from "next/navigation";
+import { AuthContext } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 const Header = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const { isAuthenticated, login, logout, travel_auth } =
+    useContext(AuthContext);
   const navigationItems = [
     { icon: Bus, label: "Bus", link: "/bus" },
     { icon: Ship, label: "Launch", link: "/launch" },
     { icon: Briefcase, label: "Boat", link: "/boat" },
     { icon: Building2, label: "Hotels", link: "/hotels" },
   ];
+
+  // Logout Function
+  const handleLogout = async () => {
+    logout();
+    toast.success("Logout successful");
+  };
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -133,7 +142,18 @@ const Header = () => {
               <Phone size={16} />
               <span>16374</span>
             </Button> */}
-            <LoginDialog />
+            {
+              isAuthenticated ? (
+                <Button
+                  variant="ghost"
+                  className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground border border-gray-300" onClick={handleLogout}                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </Button>
+              ) : (
+                <LoginDialog />
+              ) 
+            }
           </div>
         </div>
       </div>

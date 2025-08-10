@@ -5,10 +5,10 @@ import { Inter } from "next/font/google";
 import CheckOutButton from "@/components/CheckOutButton";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Hero from "@/components/Hero";
 import { BookingProvider } from "@/context/BookingContext";
 import { SearchProvider } from "@/context/SearchContext";
 import HeroWrapper from "@/components/HeroWrapper";
+import AuthContextProvider from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
+        <AuthContextProvider>
         <SearchProvider>
           <BookingProvider>
             <Header />
@@ -35,6 +36,7 @@ export default function RootLayout({
             <Footer />
           </BookingProvider>
         </SearchProvider>
+        </AuthContextProvider>
       </body>
     </html>
   );

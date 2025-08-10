@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
-
 import {
   Accordion,
   AccordionContent,

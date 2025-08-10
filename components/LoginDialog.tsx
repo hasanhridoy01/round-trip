@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +42,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { AuthContext } from "@/context/AuthContext";
 
 const LoginDialog = () => {
   const router = useRouter();
@@ -52,6 +53,7 @@ const LoginDialog = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useContext(AuthContext);
 
   // Field States
   const [loginField, setLoginField] = useState(false);
@@ -159,9 +161,8 @@ const LoginDialog = () => {
         }
       );
 
-      localStorage.setItem("token", data.token);
-
       toast.success("Login successful");
+      login(data.token);
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error("Login failed", {
@@ -171,6 +172,7 @@ const LoginDialog = () => {
       setIsLoading(false);
     }
   };
+  
   return (
     <Dialog>
       <DialogTrigger>

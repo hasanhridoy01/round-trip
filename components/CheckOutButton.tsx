@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ShoppingCart,
@@ -33,9 +33,12 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import LoginDialog from "./LoginDialog";
+import { AuthContext } from "@/context/AuthContext";
 
 const CheckOutButton = () => {
   const router = useRouter();
+  const { isAuthenticated, travel_auth } = useContext(AuthContext);
+  console.log(travel_auth);
   const { bookingData, setBookingData, clearBookingData } = useBookingContext();
   const [checkoutCount, setCheckoutCount] = useState<number>(0);
   const [bookings, setBookings] = useState<BookingData | null>(null);
@@ -111,14 +114,13 @@ const CheckOutButton = () => {
   };
 
   const handleBooked = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isAuthenticated) {
       toast.error("Please log in to continue booking.");
       setIsOpen(false);
-    } else {
-      toast.success("Please log in to continue booking.");
-      setIsOpen(true);
+      return;
     }
+
+    // 2. Check booking data
     if (!bookings || !("selectedCabins" in bookings)) {
       toast.error("No booking details found.");
       return;
@@ -141,21 +143,24 @@ const CheckOutButton = () => {
       };
 
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v2/order/confirm`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/order/confirm`,
         payload,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${travel_auth.token}` },
         }
       );
 
       toast.success("Booking successful!");
       console.log("Booking response:", res.data);
 
+      // Reset state
       setBookings(null);
       setCheckoutCount(0);
+      setIsOpen(true);
     } catch (error: any) {
       console.error(error);
       toast.error(error.response?.data?.message || "Booking failed.");
+      setIsOpen(true);
     }
   };
 
