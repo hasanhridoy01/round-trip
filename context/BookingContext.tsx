@@ -3,7 +3,7 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
 
 // Common selected cabin type
-interface SelectedCabin {
+export interface SelectedCabin {
   booking_id: number | null;
   cabin_class: string;
   cabin_floor: number;
@@ -63,7 +63,7 @@ interface BoatBookingData extends BaseBookingData {
 }
 
 // Union type for all booking types
-type BookingData =
+export type BookingData =
   | LaunchBookingData
   | BusBookingData
   | HotelBookingData

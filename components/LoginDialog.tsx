@@ -43,7 +43,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-const LoginDialog = (isOpen: boolean) => {
+const LoginDialog = () => {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [numberFieldDisabled, setNumberFieldDisabled] = useState(false);

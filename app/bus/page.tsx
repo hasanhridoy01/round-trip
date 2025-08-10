@@ -10,6 +10,8 @@ interface PageProps {
   };
 }
 
+export const dynamic = 'force-dynamic'
+
 // Solution 2: Alternative - disable static generation
 // export const revalidate = 0;
 

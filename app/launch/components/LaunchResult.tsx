@@ -12,7 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { set } from "date-fns";
-import { useBookingContext } from "@/context/BookingContext";
+import { useBookingContext, BookingData } from "@/context/BookingContext";
 
 function getIcon(type?: string) {
   switch (type) {
@@ -101,43 +101,7 @@ interface Cabin {
   cabin_is_ac?: boolean;
 }
 
-interface SelectedCabin {
-  booking_id: number | null;
-  cabin_class: string;
-  cabin_floor: number;
-  cabin_id: number;
-  cabin_is_ac: number;
-  cabin_no: string;
-  cabin_position: number;
-  cabin_row: number;
-  cabin_type: string;
-  cabin_type_id: number;
-  capacity: number;
-  description: string;
-  fare: number;
-  floor: string;
-  item_id: number;
-  merchant_id: number;
-  nid_check: number;
-  ownership: string;
-  route_id: number;
-  service_charge: number;
-  status: number;
-  trip_date: string;
-  trip_id: number;
-  vehicle_id: number;
-  vehicle_name: string;
-}
 
-interface bookingDetails {
-  tripId: string;
-  tripType: string;
-  floor: string;
-  selectedCabins: SelectedCabin[];
-  vehicleName: string;
-  routeName: string;
-  deckNumber: number;
-}
 
 const LaunchResult = () => {
   const searchParams = useSearchParams();
@@ -205,16 +169,13 @@ const LaunchResult = () => {
       const currentTripType = currentTrip?.service_type || "unknown";
       console.log(currentTripType);
 
-      const bookingDetails = {
+      const bookingDetails: BookingData = {
         tripId: openTripId,
-        tripType: currentTripType as "launch",
+        tripType: "launch",
         floor: floorName,
-        selectedCabins: selectedCabins.map((cabin) => ({
-          ...cabin,
-          floor: floorName,
-        })),
-        vehicleName: tripData.data.vehicle_name,
-        routeName: tripData.data.route_name,
+        selectedCabins: selectedCabins as any,
+        vehicleName: tripData.data.vehicle_name as string,
+        routeName: tripData.data.route_name as string,
         deckNumber: floorNumber,
       };
 
