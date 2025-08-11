@@ -69,9 +69,9 @@ const Hero = () => {
             defaultValue="launch"
             onValueChange={(value) =>
               setActiveTab(value as keyof TabBackgrounds)
-            }
+            }  
           >
-            <TabsList className="w-full mx-auto flex-wrap gap-1 bg-transparent">
+            <TabsList className="max-w-fit mx-auto flex flex-wrap gap-1 bg-white">
               <TabsTrigger value="bus" className="bg-white text-black">
                 <Bus size={18} /> Bus
               </TabsTrigger>
