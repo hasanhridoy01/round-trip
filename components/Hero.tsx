@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Bus, Ship, Briefcase, Building2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import BusComponent from "./search-components/Bus";
 import LaunchComponent from "./search-components/Launch";
 
@@ -37,7 +38,7 @@ const Hero = () => {
   const backgroundImage = getBackgroundImage();
 
   return (
-    <section className="relative md:pt-8 pt-14 pb-24 md:h-[350px] h-screen">
+    <section className="relative md:pt-8 pt-14 pb-24 md:h-[364px] h-[600px]">
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black opacity-20"></div>
 
@@ -63,13 +64,13 @@ const Hero = () => {
       </div>
 
       {/* Tabs positioned at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 pt-2">
+      <div className="absolute bottom-10 left-0 right-0 transform translate-y-1/2 pt-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs
             defaultValue="launch"
             onValueChange={(value) =>
               setActiveTab(value as keyof TabBackgrounds)
-            }  
+            }
           >
             <TabsList className="max-w-fit mx-auto flex flex-wrap gap-1 bg-white">
               <TabsTrigger value="bus" className="bg-white text-black">
@@ -94,10 +95,32 @@ const Hero = () => {
               <LaunchComponent />
             </TabsContent>
             <TabsContent value="boat">
-              <BusComponent />
+              <Card className="max-w-7xl mx-auto rounded-xl bg-white backdrop-blur-sm shadow-md h-[215px]">
+                <CardContent className="py-10 px-8">
+                  <div className="flex items-center gap-4">
+                    {/* <div className="flex flex-col gap-1">
+                      <h2 className="text-2xl font-semibold">Boat Booking</h2>
+                      <p className="text-muted-foreground">
+                        Book a boat for your next adventure.
+                      </p>
+                    </div> */}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             <TabsContent value="hotel">
-              <BusComponent />
+              <Card className="max-w-7xl mx-auto rounded-xl bg-white backdrop-blur-sm shadow-md h-[215px]">
+                <CardContent className="py-10 px-8">
+                  <div className="flex items-center gap-4">
+                    {/* <div className="flex flex-col gap-1">
+                      <h2 className="text-2xl font-semibold">Boat Booking</h2>
+                      <p className="text-muted-foreground">
+                        Book a boat for your next adventure.
+                      </p>
+                    </div> */}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

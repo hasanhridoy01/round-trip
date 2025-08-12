@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { set } from "date-fns";
 import { useBookingContext, BookingData } from "@/context/BookingContext";
+import Loading from "../loading";
 
 function getIcon(type?: string) {
   switch (type) {
@@ -100,8 +101,6 @@ interface Cabin {
   cabin_is_ac?: boolean;
 }
 
-
-
 const LaunchResult = () => {
   const searchParams = useSearchParams();
   const { setBookingData } = useBookingContext();
@@ -109,6 +108,7 @@ const LaunchResult = () => {
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<TripData | null>(null);
   const [tripDataLoading, setTripDataLoading] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [openTripId, setOpenTripId] = useState<string | undefined>();
   const [currentTrip, setCurrentTrip] = useState<string | undefined>();
   const [selectedCabins, setSelectedCabins] = useState<Cabin[]>([]);
@@ -158,6 +158,7 @@ const LaunchResult = () => {
   }
 
   const handleBookClick = () => {
+    setBookingLoading(true);
     if (selectedCabins.length > 0 && openTripId && tripData?.data) {
       const floorNumber = selectedCabins[0]?.cabin_floor || 2;
       const floorName =
@@ -181,6 +182,7 @@ const LaunchResult = () => {
       console.log("Booking Details:", bookingDetails);
 
       setBookingData(bookingDetails);
+      setBookingLoading(false);
       toast.success(
         `Booking ${selectedCabins.length} cabins for ${currentTripType} on ${floorName}`
       );
@@ -326,7 +328,7 @@ const LaunchResult = () => {
                   </div>
 
                   {/* Floor Render */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {tripData?.data?.floors?.map((floor) => {
                       const floorKey =
                         floor.value === 1
@@ -345,11 +347,25 @@ const LaunchResult = () => {
                       return (
                         <div
                           key={floor.value}
-                          className="rounded-tl-[200px] rounded-tr-[200px] p-4 bg-blue-50 pt-32 mt-5 border border-blue-300"
+                          className="p-4 bg-blue-50 py-10 my-36 border border-blue-300 relative"
                         >
-                          <h4 className="font-medium mb-3 text-center">
+                          <h4 className="font-medium mb-5 text-center">
                             {floor.label} Cabin Layout
                           </h4>
+
+                          {/* Top bump */}
+                          <span
+                            className="
+      absolute top-[-97px] left-0 right-0 w-full h-24 rounded-tr-[60px] rounded-tl-[60px] border border-blue-300 bg-gray-50
+    "
+                          ></span>
+
+                          {/* Bottom bump */}
+                          <span
+                            className="
+      absolute bottom-[-97px] left-0 right-0 w-full h-24 rounded-br-[60px] rounded-bl-[60px] border border-blue-300 bg-gray-50
+    "
+                          ></span>
 
                           {floorCabins &&
                           Object.keys(floorCabins).length > 0 ? (
@@ -441,11 +457,11 @@ const LaunchResult = () => {
                                                           : "D-AC"}
                                                       </span>
                                                     )}
-                                                    {cabin.status === 1 && (
+                                                    {/* {cabin.status === 1 && (
                                                       <span className="absolute top-1 right-1 text-[10px] bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
                                                         {cabin.capacity}
                                                       </span>
-                                                    )}
+                                                    )} */}
                                                   </>
                                                 )}
                                               </button>
@@ -459,9 +475,11 @@ const LaunchResult = () => {
                               )}
                             </div>
                           ) : (
-                            <p className="text-center text-sm text-gray-500">
-                              No cabin data available
-                            </p>
+                            <div className="flex justify-center items-center h-[300px]">
+                              <p className="text-center text-sm text-gray-500">
+                                No cabin data available
+                              </p>
+                            </div>
                           )}
                         </div>
                       );
@@ -474,10 +492,19 @@ const LaunchResult = () => {
                       <button
                         onClick={handleBookClick}
                         className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                        disabled={selectedCabins.length === 0}
+                        disabled={bookingLoading || selectedCabins.length === 0}
                       >
-                        Book {selectedCabins.length} Cabin
-                        {selectedCabins.length !== 1 ? "s" : ""}
+                        {bookingLoading ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                            <span>Booking...</span>
+                          </div>
+                        ) : (
+                          <>
+                            Book {selectedCabins.length} Cabin
+                            {selectedCabins.length !== 1 ? "s" : ""}
+                          </>
+                        )}
                       </button>
                     </div>
                   )}

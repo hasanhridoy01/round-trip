@@ -20,7 +20,7 @@ export default function Page({ searchParams }: PageProps) {
     searchParams.trip_from && searchParams.trip_to && searchParams.trip_date;
 
   return (
-    <div className="p-6 max-w-7xl md:pt-44 md:pb-24 mx-auto">
+    <div className="p-6 max-w-7xl md:pt-40 md:pb-24 mx-auto">
       {hasSearchParams ? (
         <BusResult />
       ) : (

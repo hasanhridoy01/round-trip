@@ -44,9 +44,7 @@ interface LaunchBookingData extends BaseBookingData {
 
 interface BusBookingData extends BaseBookingData {
   tripType: "bus";
-  seatNumbers: string[];
-  busType: string;
-  departureTime: string;
+  deckNumber: number;
 }
 
 interface HotelBookingData {
