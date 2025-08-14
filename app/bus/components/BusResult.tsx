@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useBookingContext, BookingData } from "@/context/BookingContext";
+import { useRouter } from 'next/navigation';
 
 function getIcon(type?: string) {
   switch (type) {
@@ -99,6 +100,7 @@ interface Seat {
 }
 
 const BusResult = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { setBookingData } = useBookingContext();
   const [result, setResult] = useState<BusData[] | null>(null);
@@ -209,6 +211,40 @@ const BusResult = () => {
     fetchLaunchData();
   }, [searchParams]);
 
+  const handleDateChange = (daysToAdd: number) => {
+    const currentDate = searchParams.get("trip_date");
+    if (!currentDate) return;
+
+    setLoading(false);
+
+    const date = new Date(currentDate);
+    date.setDate(date.getDate() + daysToAdd);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove time for accurate comparison
+
+    // Prevent selecting a date before today
+    if (date < today) {
+      toast.error("You cannot select a date before today.");
+      return; // Just exit without updating
+    }
+
+    // Format date as YYYY-MM-DD
+    const newDate = `${date.getFullYear()}-${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+    // Create new params object with updated date
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("trip_date", newDate);
+
+    // Update URL without reload
+    router.push(`?${newParams.toString()}`);
+  };
+
+  const handlePreviousDay = () => handleDateChange(-1);
+  const handleNextDay = () => handleDateChange(1);
+
   const handleTripSelect = async (tripId: string) => {
     setTripDataLoading(true);
 
@@ -241,6 +277,34 @@ const BusResult = () => {
 
   return (
     <div className="p-4 max-w-7xl md:pt-8 md:pb-10 mx-auto">
+      <div className="flex items-center justify-between mb-5 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-100">
+        <div className="flex items-center space-x-2">
+          <h3 className="font-medium text-sm text-blue-600 bg-primary/10 uppercase p-3 rounded-full">
+            {searchParams.get("type")}
+          </h3>
+          <p className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-full">
+            {searchParams.get("trip_from")} → {searchParams.get("trip_to")} on{" "}
+            <span className="font-medium text-red-500 text-md">
+              {searchParams.get("trip_date")}
+            </span>
+          </p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={handlePreviousDay}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          >
+            Previous Day
+          </button>
+          <button
+            onClick={handleNextDay}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Next Day
+          </button>
+        </div>
+      </div>
+
       <Accordion
         type="single"
         collapsible

@@ -120,15 +120,16 @@ const LaunchComponent = () => {
             </div>
 
             {/* Journey Date */}
-            <div className="md:col-span-2   space-y-1.5 relative">
+            <div className="md:col-span-2 space-y-1.5 relative">
               <span className="text-sm text-primary font-medium uppercase">
                 Journey Date
               </span>
               <div className="relative bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                <Calendar className="text-primary h-4 w-4 mr-2" />
+                <Calendar className="text-primary h-4 w-4" />
                 <Input
                   type="date"
                   value={journeyDate}
+                  min={new Date().toISOString().split("T")[0]} // Prevent past dates
                   onChange={(e) => setJourneyDate(e.target.value)}
                   className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal"
                 />
@@ -141,10 +142,11 @@ const LaunchComponent = () => {
                   Return Date
                 </span>
                 <div className="bg-gray-100 rounded-md px-3 py-2 flex items-center">
-                  <Calendar className="text-primary h-4 w-4 mr-2" />
+                  <Calendar className="text-primary h-4 w-4" />
                   <Input
                     type="date"
                     value={returnDate}
+                    min={new Date().toISOString().split("T")[0]} // Prevent past dates
                     onChange={(e) => setReturnDate(e.target.value)}
                     className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal"
                   />
