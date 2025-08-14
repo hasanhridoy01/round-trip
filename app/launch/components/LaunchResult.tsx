@@ -280,7 +280,13 @@ const LaunchResult = () => {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
-  if (!result || result.length === 0) return <p>No results found.</p>;
+
+  if (!result || result.length === 0)
+    return (
+      <p className="text-center py-4 text-muted-foreground w-full">
+        No results found.
+      </p>
+    );
 
   return (
     <div className="p-4 max-w-7xl md:pt-8 md:pb-10 mx-auto">
@@ -581,6 +587,12 @@ const LaunchResult = () => {
             </AccordionContent>
           </AccordionItem>
         ))}
+        {!result ||
+          (result.length === 0 && (
+            <div className="text-center py-4 text-muted-foreground">
+              No cabin data available
+            </div>
+          ))}
       </Accordion>
     </div>
   );

@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useBookingContext, BookingData } from "@/context/BookingContext";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 function getIcon(type?: string) {
   switch (type) {
@@ -273,7 +273,12 @@ const BusResult = () => {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
-  if (!result || result.length === 0) return <p>No results found.</p>;
+  if (!result || result.length === 0)
+    return (
+      <p className="text-center py-4 text-muted-foreground w-full">
+        No results found.
+      </p>
+    );
 
   return (
     <div className="p-4 max-w-7xl md:pt-8 md:pb-10 mx-auto">

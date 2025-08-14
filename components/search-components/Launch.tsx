@@ -24,6 +24,45 @@ const LaunchComponent = () => {
   const [returnDate, setReturnDate] = React.useState("");
   const [trip, setTrip] = React.useState("launch");
 
+  const cities = [
+    // Dhaka Division
+    "Dhaka",
+    "Munshiganj",
+    "Manikganj",
+    "Faridpur",
+    "Shariatpur",
+    "Rajbari",
+    "Madaripur",
+
+    // Barishal Division
+    "Barishal",
+    "Bhola",
+    "Patuakhali",
+    "Jhalokati",
+
+    // Khulna Division
+    "Khulna",
+    "Mongla",
+    "Morrelganj",
+
+    // Chattogram Division
+    "Chittagong",
+    "Sandwip",
+    "Hatiya",
+
+    // Sylhet Division
+    "Sylhet",
+    "Sunamganj",
+
+    // Mymensingh Division
+    "Jamalpur",
+    "Kurigram",
+  ];
+
+  const [showSuggestions, setShowSuggestions] = React.useState<{
+    field: "from" | "to" | null;
+  }>({ field: null });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value as "oneWay" | "roundTrip";
     setTripType(value);
@@ -36,11 +75,18 @@ const LaunchComponent = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     router.push(
       `/launch?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
     );
   };
+
+  // Filtered city list
+  const filteredFromCities = cities.filter((city) =>
+    city.toLowerCase().includes(fromLocation.toLowerCase())
+  );
+  const filteredToCities = cities.filter((city) =>
+    city.toLowerCase().includes(toLocation.toLowerCase())
+  );
 
   return (
     <Card className="max-w-7xl mx-auto rounded-xl bg-white backdrop-blur-sm shadow-md">
@@ -75,7 +121,7 @@ const LaunchComponent = () => {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
             {/* From */}
-            <div className="md:col-span-2 space-y-1.5">
+            <div className="md:col-span-2 space-y-1.5 relative">
               <span className="text-sm text-primary font-medium uppercase">
                 From
               </span>
@@ -84,10 +130,32 @@ const LaunchComponent = () => {
                 <Input
                   placeholder="Departure City"
                   value={fromLocation}
-                  onChange={(e) => setFromLocation(e.target.value)}
+                  onChange={(e) => {
+                    setFromLocation(e.target.value);
+                    setShowSuggestions({ field: "from" });
+                  }}
+                  onBlur={() =>
+                    setTimeout(() => setShowSuggestions({ field: null }), 200)
+                  }
                   className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
                 />
               </div>
+              {showSuggestions.field === "from" &&
+                fromLocation &&
+                filteredFromCities.length > 0 && (
+                  <ul className="absolute z-10 w-full bg-white shadow-md rounded-md mt-1 max-h-40 overflow-y-auto">
+                    {filteredFromCities.map((city) => (
+                      <li
+                        key={city}
+                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                        onMouseDown={() => setFromLocation(city)}
+                      >
+                        <MapPin className="text-primary h-4 w-4 mr-2" />
+                        {city}
+                      </li>
+                    ))}
+                  </ul>
+                )}
             </div>
 
             {/* Swap Button */}
@@ -104,7 +172,7 @@ const LaunchComponent = () => {
             </div>
 
             {/* To */}
-            <div className="md:col-span-2 space-y-1.5">
+            <div className="md:col-span-2 space-y-1.5 relative">
               <span className="text-sm text-primary font-medium uppercase">
                 To
               </span>
@@ -113,10 +181,32 @@ const LaunchComponent = () => {
                 <Input
                   placeholder="Destination City"
                   value={toLocation}
-                  onChange={(e) => setToLocation(e.target.value)}
+                  onChange={(e) => {
+                    setToLocation(e.target.value);
+                    setShowSuggestions({ field: "to" });
+                  }}
+                  onBlur={() =>
+                    setTimeout(() => setShowSuggestions({ field: null }), 200)
+                  }
                   className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal placeholder-gray-500"
                 />
               </div>
+              {showSuggestions.field === "to" &&
+                toLocation &&
+                filteredToCities.length > 0 && (
+                  <ul className="absolute z-10 w-full bg-white shadow-md rounded-md mt-1 max-h-40 overflow-y-auto">
+                    {filteredToCities.map((city) => (
+                      <li
+                        key={city}
+                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                        onMouseDown={() => setToLocation(city)}
+                      >
+                        <MapPin className="text-primary h-4 w-4 mr-2" />
+                        {city}
+                      </li>
+                    ))}
+                  </ul>
+                )}
             </div>
 
             {/* Journey Date */}
@@ -129,7 +219,7 @@ const LaunchComponent = () => {
                 <Input
                   type="date"
                   value={journeyDate}
-                  min={new Date().toISOString().split("T")[0]} // Prevent past dates
+                  min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => setJourneyDate(e.target.value)}
                   className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal"
                 />
@@ -146,7 +236,7 @@ const LaunchComponent = () => {
                   <Input
                     type="date"
                     value={returnDate}
-                    min={new Date().toISOString().split("T")[0]} // Prevent past dates
+                    min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setReturnDate(e.target.value)}
                     className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-base font-normal"
                   />
