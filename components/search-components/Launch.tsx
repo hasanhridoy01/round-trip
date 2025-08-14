@@ -89,7 +89,7 @@ const LaunchComponent = () => {
   );
 
   return (
-    <Card className="max-w-7xl mx-auto rounded-xl bg-white backdrop-blur-sm shadow-md">
+    <Card className="max-w-7xl mx-auto rounded-xl bg-white shadow-md">
       <CardContent className="py-10 px-8">
         {/* Trip Type */}
         <div className="flex items-center space-x-6 mb-6">

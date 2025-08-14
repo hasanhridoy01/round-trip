@@ -2,7 +2,15 @@
 
 import React, { useContext, useState } from "react";
 import Link from "next/link";
-import { Bus, Ship, Phone, Menu, Briefcase, Building2, LogOut } from "lucide-react";
+import {
+  Bus,
+  Ship,
+  Phone,
+  Menu,
+  Briefcase,
+  Building2,
+  LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -51,16 +59,16 @@ const Header = () => {
               const isActive = pathname === item.link;
 
               return (
-                <Button
+                <Link
                   key={item.label}
-                  variant="ghost"
-                  className={`flex items-center w-full justify-start space-x-2 hover:bg-primary/10 ${
-                    isActive ? "text-primary bg-primary/10" : ""
+                  href={item.link}
+                  className={`flex items-center gap-2 font-semibold w-full justify-start space-x-2 px-3 py-2 rounded hover:bg-primary/10 ${
+                    pathname === item.link ? "text-primary bg-primary/10" : ""
                   }`}
                 >
                   <item.icon size={20} />
-                  <Link href={item.link}>{item.label}</Link>
-                </Button>
+                  {item.label}
+                </Link>
               );
             })}
           </nav>
@@ -94,21 +102,18 @@ const Header = () => {
                       const isActive = pathname === item.link;
 
                       return (
-                        <Button
+                        <Link
                           key={item.label}
-                          variant="ghost"
-                          className={`w-full justify-start space-x-3 h-12 ${
-                            isActive
-                              ? "bg-blue-50 text-blue-600"
-                              : "hover:bg-gray-50"
+                          href={item.link}
+                          className={`flex items-center gap-3 font-semibold w-full justify-start space-x-2 px-3 py-2 rounded hover:bg-primary/10 ${
+                            pathname === item.link
+                              ? "text-primary bg-primary/10"
+                              : ""
                           }`}
-                          onClick={() => setIsMenuOpen(false)}
                         >
                           <item.icon size={20} />
-                          <Link href={item.link} className="font-medium">
-                            {item.label}
-                          </Link>
-                        </Button>
+                          {item.label}
+                        </Link>
                       );
                     })}
                   </div>
@@ -142,18 +147,18 @@ const Header = () => {
               <Phone size={16} />
               <span>16374</span>
             </Button> */}
-            {
-              isAuthenticated ? (
-                <Button
-                  variant="ghost"
-                  className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground border border-gray-300" onClick={handleLogout}                >
-                  <LogOut size={16} />
-                  <span>Logout</span>
-                </Button>
-              ) : (
-                <LoginDialog />
-              ) 
-            }
+            {isAuthenticated ? (
+              <Button
+                variant="ghost"
+                className="flex items-center space-x-2 hover:bg-primary/70 text-primary hover:text-primary-foreground border border-gray-300"
+                onClick={handleLogout}
+              >
+                <LogOut size={16} />
+                <span>Logout</span>
+              </Button>
+            ) : (
+              <LoginDialog />
+            )}
           </div>
         </div>
       </div>
