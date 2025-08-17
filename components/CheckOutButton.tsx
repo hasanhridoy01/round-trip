@@ -38,7 +38,6 @@ import { AuthContext } from "@/context/AuthContext";
 const CheckOutButton = () => {
   const router = useRouter();
   const { isAuthenticated, travel_auth } = useContext(AuthContext);
-  console.log(travel_auth);
   const { bookingData, setBookingData, clearBookingData } = useBookingContext();
   const [checkoutCount, setCheckoutCount] = useState<number>(0);
   const [bookings, setBookings] = useState<BookingData | null>(null);

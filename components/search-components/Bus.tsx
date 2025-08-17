@@ -19,6 +19,7 @@ const BusComponent = () => {
   const [journeyDate, setJourneyDate] = React.useState("");
   const [returnDate, setReturnDate] = React.useState("");
   const [trip, setTrip] = React.useState("bus");
+  const [loading, setLoading] = React.useState(false);
 
   // Famous Bangladeshi cities for bus routes
   const bdCities = [
@@ -82,9 +83,15 @@ const BusComponent = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push(
-      `/bus?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
-    );
+    setLoading(true);
+
+    try {
+      router.push(
+        `/bus?type=${trip}&trip_date=${journeyDate}&return_trip_date=${returnDate}&trip_from=${fromLocation}&trip_to=${toLocation}`
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Filtered city lists
@@ -264,7 +271,7 @@ const BusComponent = () => {
                 type="submit"
                 className="h-14 w-full bg-primary hover:bg-primary/80 text-white text-lg font-medium rounded-md"
               >
-                SEARCH
+                {loading ? "SEARCHING..." : "SEARCH"}
               </Button>
             </div>
           </div>

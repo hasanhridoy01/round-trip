@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import BusComponent from "./search-components/Bus";
 import LaunchComponent from "./search-components/Launch";
+import { roundToNearestHours } from "date-fns";
+import { useRouter } from "next/navigation";
 
 type TabBackgrounds = {
   [key: string]: string;
@@ -17,6 +19,7 @@ type TabBackgrounds = {
 };
 
 const Hero = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<keyof TabBackgrounds>("launch");
 
   // Define background images for each tab
@@ -44,10 +47,9 @@ const Hero = () => {
 
       {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center transition-all duration-[2000ms] ease-in-out"
         style={{
           backgroundImage: backgroundImage,
-          opacity: 1,
         }}
       ></div>
 
@@ -73,16 +75,32 @@ const Hero = () => {
             }
           >
             <TabsList className="max-w-fit mx-auto flex flex-wrap gap-1 bg-white">
-              <TabsTrigger value="bus" className="bg-white text-black">
+              <TabsTrigger
+                value="bus"
+                className="bg-white text-black"
+                onClick={() => router.push("/bus")}
+              >
                 <Bus size={18} /> Bus
               </TabsTrigger>
-              <TabsTrigger value="launch" className="bg-white text-black">
+              <TabsTrigger
+                value="launch"
+                className="bg-white text-black"
+                onClick={() => router.push("/launch")}
+              >
                 <Ship size={18} /> Launch
               </TabsTrigger>
-              <TabsTrigger value="boat" className="bg-white text-black">
+              <TabsTrigger
+                value="boat"
+                className="bg-white text-black"
+                onClick={() => router.push("/boat")}
+              >
                 <Briefcase size={18} /> Boat
               </TabsTrigger>
-              <TabsTrigger value="hotel" className="bg-white text-black">
+              <TabsTrigger
+                value="hotel"
+                className="bg-white text-black"
+                onClick={() => router.push("/hotels")}
+              >
                 <Building2 size={18} /> Hotels
               </TabsTrigger>
             </TabsList>
