@@ -116,6 +116,15 @@ const LaunchResult = () => {
   const [selectedCabins, setSelectedCabins] = useState<Cabin[]>([]);
   const [activeFloor, setActiveFloor] = useState(1);
 
+  function getOrdinalSuffix(num: number) {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return "st";
+    if (j === 2 && k !== 12) return "nd";
+    if (j === 3 && k !== 13) return "rd";
+    return "th";
+  }
+
   const handleTripSelect = async (tripId: string) => {
     setTripDataLoading(true);
     setSelectedCabins([]);
@@ -138,26 +147,31 @@ const LaunchResult = () => {
     }
   };
 
-  const handleCabinClick = (cabin: Cabin) => {
-    if (!cabin.item_id || cabin.cabin_type === "empty" || cabin.status !== 1)
-      return;
+  // const handleCabinClick = (cabin: Cabin) => {
+  //   if (!cabin.item_id || cabin.cabin_type === "empty" || cabin.status !== 1)
+  //     return;
 
-    setSelectedCabins((prev) => {
-      if (prev.some((c) => c.item_id === cabin.item_id)) {
-        return prev.filter((c) => c.item_id !== cabin.item_id);
-      }
-      return [...prev, cabin];
-    });
+  //   setSelectedCabins((prev) => {
+  //     if (prev.some((c) => c.item_id === cabin.item_id)) {
+  //       return prev.filter((c) => c.item_id !== cabin.item_id);
+  //     }
+  //     return [...prev, cabin];
+  //   });
+  // };
+
+  const handleCabinClick = async(cabin: Cabin) => {
+    const ItemId = cabin.item_id?.toString();
+    const tripId = openTripId?.toString();
+
+    console.log(ItemId, tripId);
+    
+    // try{
+    //   await axios.get(
+    //     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/book`,
+        
+    //   )
+    // }
   };
-
-  function getOrdinalSuffix(num: number) {
-    const j = num % 10;
-    const k = num % 100;
-    if (j === 1 && k !== 11) return "st";
-    if (j === 2 && k !== 12) return "nd";
-    if (j === 3 && k !== 13) return "rd";
-    return "th";
-  }
 
   const handleBookClick = () => {
     setBookingLoading(true);
