@@ -28,7 +28,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="text-center lg:text-left mb-6 lg:mb-0">
               <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center lg:justify-start">
-                🎉 Welcome to a Smarter TravelHub Login!
+                🎉 Welcome to a Smarter Durpalla Login!
               </h2>
               <p className="text-green-100 mb-2">
                 If you're an existing user, just reset your password once to
@@ -36,7 +36,7 @@ export default function Home() {
               </p>
               <p className="text-green-100">
                 Now access <strong>Bus</strong>, <strong>Air</strong>, and{" "}
-                <strong>Park</strong> with a single TravelHub account. Easy and
+                <strong>Park</strong> with a single Durpalla account. Easy and
                 secure!
               </p>
             </div>

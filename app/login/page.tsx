@@ -222,7 +222,7 @@ export default function LoginPage() {
                 Welcome Back
               </CardTitle>
               <CardDescription className="text-gray-600 mt-2">
-                Sign in to your TravelHub account to continue your journey
+                Sign in to your Durpalla account to continue your journey
               </CardDescription>
             </CardHeader>
 

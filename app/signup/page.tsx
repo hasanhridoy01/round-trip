@@ -65,7 +65,7 @@ export default function SignUpPage() {
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-3xl font-bold text-gray-900">Create Account</CardTitle>
               <CardDescription className="text-gray-600 mt-2">
-                Join TravelHub and start your journey with us
+                Join Durpalla and start your journey with us
               </CardDescription>
             </CardHeader>
             
