@@ -50,7 +50,7 @@ const Header = () => {
           <div className="cursor-pointer flex items-center">
             <Link href={"/"}>
               <img
-                src="/logo.jpg"
+                src="/logo-colored.png"
                 alt="Logo"
                 className="lg:h-12 h-8 w-auto object-contain"
               />

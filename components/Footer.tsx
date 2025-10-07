@@ -10,7 +10,7 @@ const Footer = () => {
             <div className="cursor-pointer flex items-center mb-2">
               <Link href={"/"}>
                 <img
-                  src="/footer-logo.jpg"
+                  src="/logo-white.png"
                   alt="Logo"
                   className="lg:h-12 h-8 w-auto object-contain"
                 />
