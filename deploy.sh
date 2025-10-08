@@ -1,43 +1,70 @@
 #!/bin/bash
-# Redeploy script for Next.js app (web.durpalla.com)
-# Usage: sudo bash /usr/local/bin/redeploy-web-durpalla.sh
+set -euo pipefail
 
 APP_DIR="/var/www/html/web.durpalla.com"
-SERVICE="next-web-durpalla"
+SERVICE="next-durpalla"
 USER="nginx"
+PORT="4000"
+NODE_BIN="$(command -v node || echo /usr/bin/node)"
 
-echo "🚀 Redeploying Next.js app at $APP_DIR ..."
-echo "-----------------------------------------"
+echo "🚀 Redeploying $APP_DIR (service: $SERVICE) ..."
 
-# 1. Stop running service
-echo "🛑 Stopping existing service..."
-systemctl stop "$SERVICE"
+# 0) Ensure service exists; if not, create it
+if [ ! -f "/etc/systemd/system/${SERVICE}.service" ]; then
+  echo "🧩 Creating systemd unit ${SERVICE}.service ..."
+  cat <<EOF | sudo tee /etc/systemd/system/${SERVICE}.service >/dev/null
+[Unit]
+Description=Next.js - web.durpalla.com
+After=network.target
 
-# 2. Ensure correct ownership
-echo "🔧 Fixing permissions..."
-chown -R $USER:$USER "$APP_DIR"
+[Service]
+Type=simple
+User=${USER}
+WorkingDirectory=${APP_DIR}
 
-# 3. Remove old build & lock conflicts
-echo "🧹 Cleaning old build and lock files..."
-rm -rf "$APP_DIR/.next"
-rm -f "$APP_DIR/package-lock.json"
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=${PORT}
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
 
-# 4. Install dependencies
-echo "📦 Installing dependencies..."
-sudo -u $USER bash -lc "cd $APP_DIR && yarn install --frozen-lockfile"
+ExecStart=${NODE_BIN} ./node_modules/next/dist/bin/next start -p ${PORT} -H 127.0.0.1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
 
-# 5. Build the app
-echo "🏗️ Building the project..."
-sudo -u $USER bash -lc "cd $APP_DIR && yarn build"
+[Install]
+WantedBy=multi-user.target
+EOF
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now "${SERVICE}" || true
+fi
 
-# 6. Restart service
-echo "🔁 Restarting systemd service..."
-systemctl daemon-reload
-systemctl enable --now "$SERVICE"
-systemctl restart "$SERVICE"
+echo "🛑 Stopping ${SERVICE} (if running) ..."
+sudo systemctl stop "${SERVICE}" || true
 
-# 7. Check service status
+echo "🔧 Fixing ownership ..."
+sudo chown -R "${USER}:${USER}" "${APP_DIR}"
+
+echo "🧹 Cleaning old build and lock conflicts ..."
+sudo rm -rf "${APP_DIR}/.next"
+sudo rm -f "${APP_DIR}/package-lock.json"
+
+echo "📦 Installing dependencies (yarn) ..."
+sudo -u "${USER}" bash -lc "cd '${APP_DIR}' && yarn install --frozen-lockfile"
+
+echo "🏗️ Building the app ..."
+sudo -u "${USER}" bash -lc "cd '${APP_DIR}' && yarn build"
+
+echo "🔁 Starting ${SERVICE} ..."
+sudo systemctl daemon-reload
+sudo systemctl restart "${SERVICE}"
+
 echo "✅ Service status:"
-systemctl status "$SERVICE" --no-pager
+sudo systemctl status "${SERVICE}" --no-pager || true
 
-echo "🎉 Redeploy complete!"
+echo "🩺 Health check:"
+curl -i "http://127.0.0.1:${PORT}/" || true
+
+echo "🎉 Redeploy complete."
