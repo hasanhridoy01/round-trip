@@ -1,0 +1,173 @@
+name: CI — Build & Deploy Web
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: jewel-rana/durpalla-web
+  APP_PORT: ${{ vars.APP_PORT || '4000' }}
+  NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'https://apigw.durpalla.com/api/v1' }}
+
+jobs:
+  build-and-push:
+    name: Build Docker Image & Push to GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=web-{{date 'YYYYMMDD'}}-{{sha}},enable=true
+            type=raw,value=web-latest,enable=true
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push web image
+        id: build
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        run: |
+          set -euo pipefail
+          SHA_TAG="web-$(date -u +%Y%m%d)-${GITHUB_SHA:0:7}"
+          docker build \
+            --build-arg NEXT_PUBLIC_API_BASE_URL="${{ env.NEXT_PUBLIC_API_BASE_URL }}" \
+            -t "${IMAGE}:web-latest" \
+            -t "${IMAGE}:${SHA_TAG}" \
+            .
+          docker push "${IMAGE}:web-latest"
+          docker push "${IMAGE}:${SHA_TAG}"
+          echo "version=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy → ${{ matrix.server }}
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        server:
+          - 103.60.204.94
+          - 103.60.204.238
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Pull image and restart web container
+        env:
+          DEPLOY_HOST: ${{ matrix.server }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:web-latest
+          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+          GHCR_USER: ${{ github.repository_owner }}
+          APP_PORT: ${{ env.APP_PORT }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ env.NEXT_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          KEY_FILE=~/.ssh/deploy_key
+          echo "$DEPLOY_SSH_KEY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+
+          if ! ssh-keygen -y -f "$KEY_FILE" > /dev/null 2>&1; then
+            echo "ERROR: DEPLOY_SSH_KEY is invalid."
+            exit 1
+          fi
+
+          PORT="${DEPLOY_PORT:-22}"
+          APP_LISTEN_PORT="${APP_PORT:-4000}"
+          DEPLOY_PATH="${DEPLOY_PATH:-/home/durpalla/durpalla-web}"
+          SSH_OPTS=(
+            -i "$KEY_FILE"
+            -o StrictHostKeyChecking=accept-new
+            -o UserKnownHostsFile=~/.ssh/known_hosts
+            -o IdentitiesOnly=yes
+            -o ConnectTimeout=30
+          )
+
+          echo "Syncing nginx configs to ${DEPLOY_HOST}..."
+          ssh "${SSH_OPTS[@]}" -p "$PORT" "${DEPLOY_USER}@${DEPLOY_HOST}" "mkdir -p '${DEPLOY_PATH}/script' '${DEPLOY_PATH}/docker/nginx'"
+          scp "${SSH_OPTS[@]}" -P "$PORT" -r docker/nginx/* "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/docker/nginx/"
+          scp "${SSH_OPTS[@]}" -P "$PORT" script/setup-host-nginx.sh script/deploy-docker.sh "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/script/"
+          ssh "${SSH_OPTS[@]}" -p "$PORT" "${DEPLOY_USER}@${DEPLOY_HOST}" "chmod +x '${DEPLOY_PATH}/script/'*.sh"
+
+          echo "Preparing server (disk + GHCR login)..."
+          ssh "${SSH_OPTS[@]}" -p "$PORT" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "export GHCR_TOKEN='${GHCR_TOKEN}' GHCR_USER='${GHCR_USER}'; bash -s" <<'PREP'
+          set -euo pipefail
+          DISK_USE="$(df / | awk 'NR==2 {print $5}' | tr -d '%')"
+          if [[ "$DISK_USE" -ge 90 ]]; then
+            docker builder prune -af 2>/dev/null || true
+            docker image prune -af 2>/dev/null || true
+          fi
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+          PREP
+
+          echo "Pulling image..."
+          ssh "${SSH_OPTS[@]}" -p "$PORT" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "docker pull '${IMAGE}' && docker tag '${IMAGE}' durpalla-web:local"
+
+          echo "Restarting container and nginx..."
+          ssh "${SSH_OPTS[@]}" -p "$PORT" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "export DEPLOY_PATH='${DEPLOY_PATH}' APP_PORT='${APP_LISTEN_PORT}' NEXT_PUBLIC_API_BASE_URL='${NEXT_PUBLIC_API_BASE_URL}'; bash -s" <<'EOF'
+          set -euo pipefail
+          DEPLOY_PATH="${DEPLOY_PATH:-/home/durpalla/durpalla-web}"
+          APP_PORT="${APP_PORT:-4000}"
+          IMAGE="${IMAGE:-durpalla-web:local}"
+          CONTAINER_NAME="durpalla-web"
+
+          docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+          docker run -d --name "${CONTAINER_NAME}" --restart unless-stopped \
+            --network host \
+            --log-opt max-size=20m \
+            --log-opt max-file=2 \
+            -e PORT="${APP_PORT}" \
+            -e HOSTNAME=0.0.0.0 \
+            -e NODE_ENV=production \
+            -e NEXT_PUBLIC_API_BASE_URL="${NEXT_PUBLIC_API_BASE_URL:-https://apigw.durpalla.com/api/v1}" \
+            durpalla-web:local
+
+          HEALTH_URL="http://127.0.0.1:${APP_PORT}/"
+          for i in $(seq 1 30); do
+            HTTP_CODE="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 "${HEALTH_URL}" 2>/dev/null || echo 000)"
+            if [[ "${HTTP_CODE}" -ge 200 && "${HTTP_CODE}" -lt 400 ]]; then
+              echo "Container healthy (HTTP ${HTTP_CODE})"
+              break
+            fi
+            [[ "$i" -eq 30 ]] && { docker logs "${CONTAINER_NAME}" --tail 40; exit 1; }
+            sleep 2
+          done
+
+          if [[ -f "${DEPLOY_PATH}/script/setup-assets-cdn-nginx.sh" ]] && [[ -f /opt/durpalla-apigw/docker/nginx/assets-and-apigw.host-network.conf ]]; then
+            bash "${DEPLOY_PATH}/script/setup-assets-cdn-nginx.sh"
+          elif [[ -x "${DEPLOY_PATH}/script/setup-host-nginx.sh" ]]; then
+            ROOT="${DEPLOY_PATH}" NGINX_SITE_NAME=web.durpalla.com bash "${DEPLOY_PATH}/script/setup-host-nginx.sh"
+          fi
+          EOF
