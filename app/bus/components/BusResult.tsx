@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   Accordion,
@@ -10,8 +9,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useBookingContext, BookingData } from "@/context/BookingContext";
-import { useRouter } from "next/navigation";
+import { apiGet, parseSearchTrips } from "@/lib/api";
+import { useCart } from "@/context/CartContext";
+import { useCartLock } from "@/hooks/useCartLock";
 
 function getIcon(type?: string) {
   switch (type) {
@@ -97,70 +97,41 @@ interface Seat {
   cabin_class?: string;
   ac_type?: string;
   cabin_is_ac?: boolean;
+  [key: string]: unknown;
 }
 
 const BusResult = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setBookingData } = useBookingContext();
+  const { items } = useCart();
   const [result, setResult] = useState<BusData[] | null>(null);
   const [openTripId, setOpenTripId] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
   const [tripData, setTripData] = useState<TripData | null>(null);
   const [tripDataLoading, setTripDataLoading] = useState(false);
   const [currentTrip, setCurrentTrip] = useState<string | undefined>();
-  const [selectedCabins, setSelectedCabins] = useState<Seat[]>([]);
   const [activeFloor, setActiveFloor] = useState(1);
 
+  const tripMeta = useMemo(
+    () =>
+      tripData?.data
+        ? {
+            vehicle_name: tripData.data.vehicle_name,
+            route_name: tripData.data.route_name,
+            schedule_date: tripData.data.schedule_date,
+          }
+        : undefined,
+    [tripData]
+  );
+
+  const { toggleItem, isInCart, locking } = useCartLock(
+    openTripId,
+    "seat",
+    tripMeta
+  );
+
   const handleCabinClick = (cabin: Seat) => {
-    if (!cabin.item_id || cabin.cabin_type === "empty" || cabin.status !== 1)
-      return;
-
-    setSelectedCabins((prev) => {
-      if (prev.some((c) => c.item_id === cabin.item_id)) {
-        return prev.filter((c) => c.item_id !== cabin.item_id);
-      }
-      return [...prev, cabin];
-    });
-  };
-
-  function getOrdinalSuffix(num: number) {
-    const j = num % 10;
-    const k = num % 100;
-    if (j === 1 && k !== 11) return "st";
-    if (j === 2 && k !== 12) return "nd";
-    if (j === 3 && k !== 13) return "rd";
-    return "th";
-  }
-
-  const handleBookClick = () => {
-    if (selectedCabins.length > 0 && openTripId && tripData?.data) {
-      const floorNumber = selectedCabins[0]?.cabin_floor || 2;
-      const floorName =
-        tripData.data.floors?.find((f) => f.value === floorNumber)?.label ||
-        `${floorNumber}${getOrdinalSuffix(floorNumber)} Floor`;
-
-      const currentTrip = result?.find((trip) => trip.service_type);
-      const currentTripType = currentTrip?.service_type || "unknown";
-      console.log(currentTripType);
-
-      const bookingDetails: BookingData = {
-        tripId: openTripId,
-        tripType: "bus",
-        floor: floorName,
-        selectedCabins: selectedCabins as any,
-        vehicleName: tripData.data.vehicle_name as string,
-        routeName: tripData.data.route_name as string,
-        deckNumber: floorNumber,
-      };
-
-      console.log("Booking Details:", bookingDetails);
-
-      setBookingData(bookingDetails);
-      toast.success(
-        `Booking ${selectedCabins.length} cabins for ${currentTripType} on ${floorName}`
-      );
-    }
+    toggleItem(cabin);
   };
 
   useEffect(() => {
@@ -189,15 +160,20 @@ const BusResult = () => {
           params.append("return_trip_date", return_trip_date);
         }
 
-        const response = await axios.get(
-          `${
-            process.env.NEXT_PUBLIC_API_BASE_URL
-          }/api/v2/search?${params.toString()}`
-        );
+        const response = await apiGet<Record<string, unknown>>("search", {
+          trip_date,
+          trip_from,
+          trip_to,
+          type: trip,
+          ...(trip === "roundTrip" && return_trip_date
+            ? { return_trip_date }
+            : {}),
+        });
 
-        if (response.data.success && Array.isArray(response.data.data)) {
+        const trips = parseSearchTrips(response);
+        if (trips.length > 0) {
           toast.success(`Search successful for ${trip} trips`);
-          setResult(response.data.data);
+          setResult(trips as BusData[]);
         } else {
           toast.error("No trips found");
         }
@@ -249,14 +225,12 @@ const BusResult = () => {
     setTripDataLoading(true);
 
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/trip/${tripId}`
-      );
+      const response = await apiGet<TripData>(`trip/${tripId}`);
 
-      if (response.data.success) {
+      if ((response as { success?: boolean }).success !== false) {
         toast.success("Trip details loaded successfully");
 
-        setTripData(response.data);
+        setTripData(response);
       } else {
         toast.error("Failed to load trip details");
       }
@@ -508,8 +482,10 @@ const BusResult = () => {
     ${
       cabin.cabin_type === "empty"
         ? "bg-gray-200 border-dashed border-gray-500 cursor-default"
-        : selectedCabins.some((c) => c.item_id === cabin.item_id)
-        ? "bg-blue-200 border-blue-400"
+        : isInCart(cabin.item_id!)
+        ? "bg-primary/20 border-primary"
+        : locking === cabin.item_id
+        ? "opacity-60 cursor-wait"
         : cabin.status === 1
         ? "bg-green-200 border-green-400 hover:bg-green-300 cursor-pointer"
         : "bg-red-100 border-red-300 opacity-70 cursor-not-allowed"
@@ -562,17 +538,11 @@ const BusResult = () => {
                     })}
                   </div>
 
-                  {/* Book Button */}
-                  {selectedCabins.length > 0 && (
+                  {items.length > 0 && (
                     <div className="flex justify-center">
-                      <button
-                        onClick={handleBookClick}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                        disabled={selectedCabins.length === 0}
-                      >
-                        Book {selectedCabins.length} Cabin
-                        {selectedCabins.length !== 1 ? "s" : ""}
-                      </button>
+                      <p className="text-sm text-primary font-medium">
+                        {items.length} item{items.length !== 1 ? "s" : ""} in cart — use the cart button to checkout
+                      </p>
                     </div>
                   )}
                 </div>

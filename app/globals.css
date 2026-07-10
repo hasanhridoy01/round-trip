@@ -18,9 +18,9 @@ body {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
 
-  /* 👇 Change primary color here */
-  --primary: 204 70% 53%; /* #3498DB in HSL */
-  --primary-foreground: 210 40% 98%;
+  /* Durpalla brand primary #006D9C */
+  --primary: 198 100% 31%;
+  --primary-foreground: 0 0% 100%;
 
   --secondary: 145 63% 49%; /* Green */
   --secondary-foreground: 0 0% 100%;
@@ -131,5 +131,5 @@ select {
 
 
 .bg-theme {
-  background-color: #3498DB;
+  background-color: #006D9C;
 }

@@ -34,7 +34,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import axios from "axios";
+import { apiPostForm, extractToken } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   InputOTP,
@@ -66,18 +66,12 @@ const LoginDialog = () => {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/check`,
-        { mobile: phoneNumber },
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const data = await apiPostForm<Record<string, unknown>>("auth/check", {
+        mobile: phoneNumber,
+      });
 
       if (!data.success) {
-        toast.error(data.message, {
+        toast.error(String(data.message || "Request failed"), {
           duration: 5000,
         });
         setPhoneNumber("");
@@ -99,7 +93,7 @@ const LoginDialog = () => {
         setNumberFieldDisabled(true);
         toast.success("Please check your mobile number!");
       } else {
-        toast.error(data.message);
+        toast.error(String(data.message || "Unexpected response"));
       }
     } catch (error: any) {
       console.error("Search error:", error);
@@ -116,16 +110,14 @@ const LoginDialog = () => {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/otp`,
-        { mobile: phoneNumber },
-        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-      );
+      const data = await apiPostForm<Record<string, unknown>>("auth/otp/send", {
+        mobile: phoneNumber,
+      });
 
       if (data.success) {
         toast.success("OTP sent successfully");
       } else {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(String(data.message || "Something went wrong"));
       }
     } catch (error: any) {
       console.error("OTP error:", error);
@@ -147,22 +139,16 @@ const LoginDialog = () => {
     setIsLoading(true);
 
     try {
-      const params = new URLSearchParams();
-      params.append("mobile", phoneNumber);
-      params.append("password", password);
+      const data = await apiPostForm<Record<string, unknown>>("auth/login", {
+        mobile: phoneNumber,
+        password,
+      });
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/login`,
-        params,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const token = extractToken(data);
+      if (!token) throw new Error("No token received");
 
       toast.success("Login successful");
-      login(data.token);
+      login(token);
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error("Login failed", {

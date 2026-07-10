@@ -88,10 +88,8 @@ const Header = () => {
               <SheetContent side="right" className="w-80">
                 <SheetHeader>
                   <SheetTitle className="text-left">
-                    <div className="text-xl font-bold text-blue-600">
-                      <Link href={"/"}>
-                        Travel<span className="text-purple-600">Hub</span>
-                      </Link>
+                    <div className="text-xl font-bold text-primary">
+                      <Link href={"/"}>Durpalla</Link>
                     </div>
                   </SheetTitle>
                 </SheetHeader>

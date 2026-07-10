@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import CheckOutButton from "@/components/CheckOutButton";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { BookingProvider } from "@/context/BookingContext";
+import { CartProvider } from "@/context/CartContext";
 import { SearchProvider } from "@/context/SearchContext";
 import HeroWrapper from "@/components/HeroWrapper";
 import AuthContextProvider from "@/context/AuthContext";
@@ -27,14 +27,14 @@ export default function RootLayout({
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <AuthContextProvider>
         <SearchProvider>
-          <BookingProvider>
+          <CartProvider>
             <Header />
             <HeroWrapper />
             <main className="flex-grow">{children}</main>
             <CheckOutButton />
             <Toaster position="top-right" />
             <Footer />
-          </BookingProvider>
+          </CartProvider>
         </SearchProvider>
         </AuthContextProvider>
       </body>

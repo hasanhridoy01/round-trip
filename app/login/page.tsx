@@ -25,8 +25,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { apiPostForm, extractToken } from "@/lib/api";
+import { AuthContext } from "@/context/AuthContext";
 import {
   InputOTP,
   InputOTPGroup,
@@ -36,6 +38,7 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useContext(AuthContext);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [numberFieldDisabled, setNumberFieldDisabled] = useState(false);
   const [password, setPassword] = useState("");
@@ -55,19 +58,13 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/check`,
-        { mobile: phoneNumber },
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const data = await apiPostForm<Record<string, unknown>>("auth/check", {
+        mobile: phoneNumber,
+      });
 
       if (!data.success) {
         toast.error("Search failed", {
-          description: data.message || "Something went wrong",
+          description: String(data.message || "Something went wrong"),
         });
         setPhoneNumber("");
         return;
@@ -103,7 +100,7 @@ export default function LoginPage() {
         });
       } else {
         toast.warning("Unexpected response", {
-          description: data.message || "Unknown step from server",
+          description: String(data.message || "Unknown step from server"),
         });
       }
     } catch (error: any) {
@@ -126,16 +123,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/otp`,
-        { mobile: phoneNumber },
-        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-      );
+      const data = await apiPostForm<Record<string, unknown>>("auth/otp/send", {
+        mobile: phoneNumber,
+      });
 
       if (data.success) {
         toast.success("OTP sent successfully");
       } else {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(String(data.message || "Something went wrong"));
       }
     } catch (error: any) {
       console.error("OTP error:", error);
@@ -157,26 +152,17 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const loginData = {
+      const data = await apiPostForm<Record<string, unknown>>("auth/login", {
         mobile: phoneNumber,
-        password: password,
-      };
+        password,
+      });
 
-      console.log(loginData);
+      const token = extractToken(data);
+      if (!token) throw new Error("No token received");
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auth/login`,
-        loginData,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-
-      localStorage.setItem("token", data.token);
-
+      login(token);
       toast.success("Login successful");
+      router.push("/");
     } catch (error: any) {
       console.error("Login error:", error);
       toast.error("Login failed", {
